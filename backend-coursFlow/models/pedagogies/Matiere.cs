@@ -1,4 +1,3 @@
-
 namespace BackendCoursFlow.Models.Pedagogies;
 
 public class Matiere

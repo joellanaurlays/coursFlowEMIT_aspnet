@@ -1,6 +1,5 @@
 namespace BackendCoursFlow.Models.Utilisateurs;
 
-using System.ComponentModel.DataAnnotations.Schema;
 
 public class Responsable
 {

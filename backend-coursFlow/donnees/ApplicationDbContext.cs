@@ -1,5 +1,4 @@
-﻿
-namespace BackendCoursFlow.Donnees;
+﻿namespace BackendCoursFlow.Donnees;
 
 
 public class ApplicationDbContext : DbContext

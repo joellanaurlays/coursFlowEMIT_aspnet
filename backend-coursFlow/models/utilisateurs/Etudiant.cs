@@ -1,11 +1,9 @@
-namespace BackendCoursFlow.Models.Utilisateurs;
-
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 using BackendCoursFlow.Models.Pedagogies;
 using BackendCoursFlow.Models.EmploiDuTemps; 
 using BackendCoursFlow.Models.Enums;
+namespace BackendCoursFlow.Models.Utilisateurs;
 
 public class Etudiant : Utilisateur
 {

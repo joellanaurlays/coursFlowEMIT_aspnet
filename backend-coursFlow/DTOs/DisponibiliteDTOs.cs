@@ -1,4 +1,4 @@
-namespace backendCoursFlow.DTOs;
+namespace BackendCoursFlow.DTOs;
 
 public class DisponibiliteDTOs
 {
