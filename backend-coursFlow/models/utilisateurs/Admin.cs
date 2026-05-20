@@ -1,13 +1,19 @@
-namespace  BackendCoursFlow.Models.Utilisateurs;
 
-using BackendCoursFlow.Models.Enums;
+namespace BackendCoursFlow.Models.Utilisateurs;
 
-public class Admin : Utilisateur
+public class Admin
 {
+    [Key]
     public int IdAdmin { get; set; }
-    public Admin()
-    {
-        Role = Role.ADMIN;
-    }
+    
+    [Required]
+    public int UtilisateurId { get; set; }
+    
+    [ForeignKey("UtilisateurId")]
+    public virtual Utilisateur Utilisateur { get; set; } = null!;
+    
+    public void GererUtilisateur(int utilisateurId, string action) { }
+    
+    public void ParametrerAnneeUniversitaire(string annee, DateTime dateDebut, DateTime dateFin) { }
 }
     

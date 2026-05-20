@@ -1,20 +1,26 @@
 namespace BackendCoursFlow.Models.Utilisateurs;
 
-using BackendCoursFlow.Models.Pedagogies;
-using BackendCoursFlow.Models.EmploiDuTemps;
-using BackendCoursFlow.Models.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
-public class Responsable : Utilisateur
+public class Responsable
 {
-   public int IdResp { get; set; }
-
-   public Responsable()
+    [Key]
+    public int IdResp { get; set; }
+    
+    [Required]
+    public int UtilisateurId { get; set; }
+    
+    [ForeignKey("UtilisateurId")]
+    public virtual Utilisateur Utilisateur { get; set; } = null!;
+    
+    public void AjouterMatiere(Matiere matiere) {   }
+    
+    public List<Professeur> AfficherProfesseurs()
     {
-        Role = Role.RESPONSABLE;
+        return new List<Professeur>();
     }
     
-    public void AjouterClasse(Classe classe)
-    {
-        // Logique pour ajouter une classe
-    }
+    public void GererEmploiDuTemps(EmploiDuTemps edt) { }
+    
+    public void ImprimerEmploiDuTemps(int classeId, string periode) { }
 }

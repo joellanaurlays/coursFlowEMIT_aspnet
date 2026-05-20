@@ -1,29 +1,31 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 namespace BackendCoursFlow.Models.Pedagogies;
 
-using System.ComponentModel.DataAnnotations;
-using BackendCoursFlow.Models.Enums;
 
 public class EmploiDuTemps
 {
     [Key]
     public int IdEmploi { get; set; }
-    public required JourSemaine Jour { get; set; }
-    public required TimeSpan HeureDebut { get; set; }
-    public required TimeSpan HeureFin { get; set; }
-    public required DateTime DateDebut { get; set; }
-    public required DateTime DateFin { get; set; }
     
-    public ICollection<Cours> Cours { get; set; } = new List<Cours>();
+    public JourSemaine Jour { get; set; }
+    public TimeSpan HeureDebut { get; set; }
+    public TimeSpan HeureFin { get; set; }
+    public DateTime DateDebut { get; set; }
+    public DateTime DateFin { get; set; }
+    
+    public int CoursId { get; set; }
+    public int ClasseId { get; set; }
+    
+    [ForeignKey("CoursId")]
+    public virtual Cours Cours { get; set; } = null!;
+    
+    [ForeignKey("ClasseId")]
+    public virtual Classe Classe { get; set; } = null!;
 
-    public void GenererPDF()
-    {
-        // Logique pour générer un PDF
-    }
-    
-    public void AfficherEmploi()
-    {
-        // Logique pour afficher l'emploi du temps
-    }
+    public void GenererPDF() { }
+
+    public void AfficherEmploi() { }
 }
     
     

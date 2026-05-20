@@ -1,28 +1,32 @@
-using System.ComponentModel.DataAnnotations;
 
 namespace BackendCoursFlow.Models.Pedagogies;
 
 public class Matiere
 {
-    [Key]
+ [Key]
     public int IdMatiere { get; set; }
-    public required string Code { get; set; }
-    public required string Nom { get; set; }
+    
+    [Required, MaxLength(50)]
+    public string Code { get; set; } = string.Empty;
+    
+    [Required, MaxLength(200)]
+    public string Nom { get; set; } = string.Empty;
+    
+    [MaxLength(1000)]
     public string? Description { get; set; }
-    public int Credit { get; set; }
     
-    public ICollection<Cours> Cours { get; set; } = new List<Cours>();
-    public ICollection<Prerequis> Prerequis { get; set; } = new List<Prerequis>();
+    public int Credits { get; set; }
     
-    public void AjouterMatiere()
-    {
-        // Logique pour ajouter une matière
-    }
+    public int VolumeHoraireGlobal { get; set; }
+    
+    // Navigation properties
+    public virtual ICollection<Cours> Cours { get; set; } = new List<Cours>();
+    public virtual ICollection<PreRequis> PreRequis { get; set; } = new List<PreRequis>();
+    public virtual ICollection<PreRequis> PreRequisPour { get; set; } = new List<PreRequis>();
+    
+    public void AjouterMatiere() { }
 
-    public void ModifierMatiere()
-    {
-        // Logique pour modifier une matière
-    }
+    public void ModifierMatiere() { }
 }
 
 

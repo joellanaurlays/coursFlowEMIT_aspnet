@@ -1,6 +1,5 @@
 namespace BackendCoursFlow.Models.Salles;
 
-using BackendCoursFlow.Models.Pedagogies;
 using BackendCoursFlow.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
@@ -8,21 +7,24 @@ public class Salle
 {
     [Key]
     public int IdSalle { get; set; }
-    public required string Nom { get; set; }
-    public required string Batiment { get; set; }
+    
+    [Required, MaxLength(100)]
+    public string Nom { get; set; } = string.Empty;
+    
+    [MaxLength(100)]
+    public string? Batiment { get; set; }
+    
     public int Capacite { get; set; }
-    public required TypeSalle Type { get; set; }
     
-    public ICollection<Cours> Cours { get; set; } = new List<Cours>();
+    public TypeSalle Type { get; set; }
     
-    public void AjouterSalle()
-    {
-        // Logique pour ajouter une salle
-    }
+    public bool EstDisponible { get; set; } = true;
     
-    public void ModifierSalle()
-    {
-        // Logique pour modifier une salle
-    }
+    public virtual ICollection<Cours> Cours { get; set; } = new List<Cours>();
+    public virtual ICollection<DisponibiliteSalle> Disponibilites { get; set; } = new List<DisponibiliteSalle>();
+    
+    public void AjouterSalle() { }
+    
+    public void ModifierSalle() { }
 }
 

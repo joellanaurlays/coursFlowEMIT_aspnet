@@ -1,4 +1,6 @@
 ## Fichiers de compilation
+bin/
+obj/
 [Bb]in/
 [Oo]bj/
 
