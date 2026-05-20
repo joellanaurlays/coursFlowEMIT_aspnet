@@ -1,9 +1,9 @@
-﻿namespace BackendCoursFlow.Controllers.Utilisateurs;
-
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using BackendCoursFlow.Models.Utilisateurs;
 using BackendCoursFlow.Services.Utilisateurs;
+using BackendCoursFlow.DTOs; 
 
+namespace BackendCoursFlow.Controllers.Utilisateurs;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -16,15 +16,15 @@ public class ProfesseurController : ControllerBase
         _professeurService = professeurService;
     }
 
-    // GET all
+    // GET: api/Professeur
     [HttpGet]
-    public async Task<ActionResult<List<Professeur>>> GetAll()
+    public async Task<ActionResult<List<UtilisateurDTO>>> GetAll()
     {
         var professeurs = await _professeurService.GetAllProfesseursAsync();
         return Ok(professeurs);
     }
 
-    // GET
+    // GET: api/Professeur/5
     [HttpGet("{id}")]
     public async Task<ActionResult<Professeur>> GetDetails(int id)
     {
@@ -38,24 +38,29 @@ public class ProfesseurController : ControllerBase
         return Ok(professeur);
     }
 
-    // POST
+    // POST: api/Professeur
     [HttpPost]
-    public async Task<IActionResult> Create(Professeur professeur)
+    public async Task<IActionResult> Create(
+        [FromBody] CreateUtilisateurRequest userRequest,
+        [FromQuery] string grade,
+        [FromQuery] string specialite)
     {
-        await _professeurService.CreateProfesseurAsync(professeur);
-        return CreatedAtAction(nameof(GetDetails), new { id = professeur.IdProf }, professeur);
+        // Validation du DTO
+        if (userRequest == null) return BadRequest("Les données de l'utilisateur sont manquantes.");
+
+        await _professeurService.CreateProfesseurWithDtoAsync(userRequest, grade, specialite);
+        return Ok(new { message = "Professeur et compte utilisateur créés avec succès." });
     }
 
-    // PUT
+    // PUT: api/Professeur/5
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, Professeur professeur)
+    public async Task<IActionResult> Update(
+        int id,
+        [FromBody] UpdateUtilisateurRequest updateRequest,
+        [FromQuery] string? grade = null,
+        [FromQuery] string? specialite = null)
     {
-        if (id != professeur.IdProf)
-        {
-            return BadRequest("L'ID dans l'URL ne correspond pas à l'ID du professeur.");
-        }
-
-        await _professeurService.UpdateProfesseurAsync(professeur);
+        await _professeurService.UpdateProfesseurAsync(id, updateRequest, grade, specialite);
         return NoContent();
     }
 }

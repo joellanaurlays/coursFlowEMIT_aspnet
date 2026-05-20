@@ -1,6 +1,7 @@
 ﻿namespace BackendCoursFlow.Controllers.EmploiDuTemps;
 
 using Microsoft.AspNetCore.Mvc;
+using BackendCoursFlow.DTOs;
 using BackendCoursFlow.Services.EmploiDuTemps;
 using BackendCoursFlow.Models.EmploiDuTemps;
 
@@ -17,7 +18,7 @@ public class DisponibiliteController : ControllerBase
 
 	// GET
 	[HttpGet("professeur/{profId}")]
-	public async Task<ActionResult<List<Disponibilite>>> GetByProf(int profId)
+	public async Task<ActionResult<List<DisponibiliteDTOs>>> GetByProf(int profId)
 	{
 		var dispo = await _dispoService.GetByProfesseurAsync(profId);
 		return Ok(dispo);
@@ -25,7 +26,7 @@ public class DisponibiliteController : ControllerBase
 
 	// POST
 	[HttpPost]
-	public async Task<IActionResult> Create(Disponibilite dispo)
+	public async Task<IActionResult> Create(CreateDisponibiliteRequest dispo)
 	{
 		var success = await _dispoService.CreateDisponibiliteAsync(dispo);
 

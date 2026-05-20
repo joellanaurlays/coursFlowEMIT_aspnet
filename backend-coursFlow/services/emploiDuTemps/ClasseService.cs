@@ -1,10 +1,9 @@
 ﻿namespace BackendCoursFlow.Services.EmploiDuTemps;
 
 using Microsoft.EntityFrameworkCore;
-
-using BackendCoursFlow.Donnees;       
-using BackendCoursFlow.Models.Pedagogies;   
+using BackendCoursFlow.Donnees;
 using BackendCoursFlow.Models.EmploiDuTemps;
+using BackendCoursFlow.DTOs; 
 
 public class ClasseService
 {
@@ -15,39 +14,70 @@ public class ClasseService
         _context = context;
     }
 
-    // Récupérer toutes les classes avec filière
-    public async Task<List<Classe>> GetAllClassesAsync()
+    // Récupérer toutes les classes
+    public async Task<List<ClasseDTOs>> GetAllClassesAsync()
     {
-        return await _context.Classes
+        var classes = await _context.Classes
             .Include(c => c.Filiere)
             .ToListAsync();
+
+        return classes.Select(c => new ClasseDTOs
+        {
+            IdClasse = c.IdClasse,
+            Nom = c.Nom,
+            Niveau = c.Niveau,
+            Groupe = c.Groupe,
+            IdFiliere = c.IdFiliere,
+            NomFiliere = c.Filiere?.Nom ?? "Inconnue"
+        }).ToList();
     }
 
-    // Récupérer une classe avec son EDT (cours)
+    // Récupérer une classe avec son EDT
     public async Task<Classe?> GetClasseWithCoursAsync(int id)
     {
         return await _context.Classes
             .Include(c => c.Filiere)
             .Include(c => c.Cours)
-                .ThenInclude(cours => cours.Matiere) // cours
+                .ThenInclude(cours => cours.Matiere)
             .Include(c => c.Cours)
-                .ThenInclude(cours => cours.Professeur) // prof
+                .ThenInclude(cours => cours.Professeur)
             .FirstOrDefaultAsync(c => c.IdClasse == id);
     }
 
-    // Récupérer toutes les classes d'une filière 
-    public async Task<List<Classe>> GetClassesByFiliereAsync(int filiereId)
+    // Récupérer toutes les classes d'une filière
+    public async Task<List<ClasseDTOs>> GetClassesByFiliereAsync(int filiereId)
     {
-        return await _context.Classes
+        var classes = await _context.Classes
+            .Include(c => c.Filiere)
             .Where(c => c.IdFiliere == filiereId)
             .ToListAsync();
+
+        return classes.Select(c => new ClasseDTOs
+        {
+            IdClasse = c.IdClasse,
+            Nom = c.Nom,
+            Niveau = c.Niveau,
+            Groupe = c.Groupe,
+            IdFiliere = c.IdFiliere,
+            NomFiliere = c.Filiere?.Nom ?? "Inconnue"
+        }).ToList();
     }
 
-    // Ajout
-    public async Task CreateClasseAsync(Classe classe)
+    // Ajout 
+    public async Task<Classe> CreateClasseAsync(CreateClasseRequest request)
     {
-        _context.Classes.Add(classe);
+        var nouvelleClasse = new Classe
+        {
+            Nom = request.Nom,
+            Niveau = request.Niveau,
+            Groupe = request.Groupe,
+            IdFiliere = request.IdFiliere
+        };
+
+        _context.Classes.Add(nouvelleClasse);
         await _context.SaveChangesAsync();
+
+        return nouvelleClasse; 
     }
 
     // Suppression

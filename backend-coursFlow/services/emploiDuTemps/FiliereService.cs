@@ -1,11 +1,9 @@
 ﻿namespace BackendCoursFlow.Services.EmploiDuTemps;
 
 using Microsoft.EntityFrameworkCore;
-
 using BackendCoursFlow.Donnees;
-using BackendCoursFlow.Models.Utilisateurs;
-using BackendCoursFlow.Models.Pedagogies;
 using BackendCoursFlow.Models.EmploiDuTemps;
+using BackendCoursFlow.DTOs;
 
 public class FiliereService
 {
@@ -17,41 +15,68 @@ public class FiliereService
     }
 
     // Récupérer toutes les filières
-    public async Task<List<Filiere>> GetAllFilieresAsync()
+    public async Task<List<FiliereDTO>> GetAllFilieresAsync()
     {
-        return await _context.Filieres.ToListAsync();
+        var filieres = await _context.Filieres.ToListAsync();
+
+        return filieres.Select(f => new FiliereDTO
+        {
+            IdFiliere = f.IdFiliere,
+            Nom = f.Nom,
+            Description = f.Description
+        }).ToList();
     }
 
-    // Récupérer une filière avec ses classes 
-    public async Task<Filiere?> GetFiliereWithClassesAsync(int id)
-    {
-        return await _context.Filieres
-            .Include(f => f.Classes)
-            .FirstOrDefaultAsync(f => f.IdFiliere == id);
-    }
-
-    // Ajout d'une filière
-    public async Task CreateFiliereAsync(Filiere filiere)
-    {
-        _context.Filieres.Add(filiere);
-        await _context.SaveChangesAsync();
-    }
-
-    // Mettre à jour une filière
-    public async Task UpdateFiliereAsync(Filiere filiere)
-    {
-        _context.Entry(filiere).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
-    }
-
-    // Suppression d'une filière
-    public async Task DeleteFiliereAsync(int id)
+    // Récupérer une filière par ID
+    public async Task<FiliereDTO?> GetFiliereByIdAsync(int id)
     {
         var filiere = await _context.Filieres.FindAsync(id);
-        if (filiere != null)
+        if (filiere == null) return null;
+
+        return new FiliereDTO
         {
-            _context.Filieres.Remove(filiere);
-            await _context.SaveChangesAsync();
-        }
+            IdFiliere = filiere.IdFiliere,
+            Nom = filiere.Nom,
+            Description = filiere.Description
+        };
+    }
+
+    // Ajout 
+    public async Task<Filiere> CreateFiliereAsync(CreateFiliereRequest request)
+    {
+        var nouvelleFiliere = new Filiere
+        {
+            Nom = request.Nom,
+            Description = request.Description
+        };
+
+        _context.Filieres.Add(nouvelleFiliere);
+        await _context.SaveChangesAsync();
+
+        return nouvelleFiliere;
+    }
+
+    // Mettre à jour
+    public async Task<bool> UpdateFiliereAsync(int id, FiliereDTO filiereDto)
+    {
+        var filiere = await _context.Filieres.FindAsync(id);
+        if (filiere == null) return false;
+
+        filiere.Nom = filiereDto.Nom;
+        filiere.Description = filiereDto.Description;
+
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    // Suppression
+    public async Task<bool> DeleteFiliereAsync(int id)
+    {
+        var filiere = await _context.Filieres.FindAsync(id);
+        if (filiere == null) return false;
+
+        _context.Filieres.Remove(filiere);
+        await _context.SaveChangesAsync();
+        return true;
     }
 }

@@ -18,6 +18,9 @@ builder.Services.AddScoped<ProfesseurService>();
 builder.Services.AddScoped<ClasseService>();
 builder.Services.AddScoped<DisponibiliteService>();
 builder.Services.AddScoped<FiliereService>();
+builder.Services.AddScoped<IAuthService>();
+builder.Services.AddScoped<IEmploiDuTempsService>();
+builder.Services.AddScoped<IMatiereService>();
 
 // Enregistrement des controlleur + detournement des cycle de navigation
 builder.Services.AddControllers()

@@ -1,4 +1,9 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BackendCoursFlow.Models.Enums;
+using BackendCoursFlow.Models.Salles;
+using BackendCoursFlow.Models.Utilisateurs;
+
 namespace BackendCoursFlow.Models.Pedagogies;
 
 public class Cours
@@ -8,7 +13,7 @@ public class Cours
     
     public string AnneeUniversitaire { get; set; } = string.Empty;
     public string Semestre { get; set; } = string.Empty;
-    public TypeCours TypeCours { get; set; }
+    //public TypeCours TypeCours { get; set; } // undefined TypeCours
     public int Duree { get; set; } // en minutes
     public int VolumeHoraire { get; set; }
     

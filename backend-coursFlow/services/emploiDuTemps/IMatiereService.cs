@@ -1,16 +1,18 @@
 using Microsoft.EntityFrameworkCore;
 using BackendCoursFlow.Donnees;
-using BackendCoursFlow.Models;
+using BackendCoursFlow.Models.Pedagogies;
 using BackendCoursFlow.DTOs;
+
 namespace BackendCoursFlow.Services.EmploiDuTemps;
+
 public interface IMatiereService
 {
-    Task<List<MatiereDTO>> GetAllMatieres();
-    Task<MatiereDTO?> GetMatiereById(int id);
-    Task<MatiereDTO> CreateMatiere(CreateMatiereRequest request);
+    Task<List<MatiereDTOs>> GetAllMatieres();
+    Task<MatiereDTOs?> GetMatiereById(int id);
+    Task<MatiereDTOs> CreateMatiere(CreateMatiereRequest request);
     Task<bool> UpdateMatiere(int id, CreateMatiereRequest request);
     Task<bool> DeleteMatiere(int id);
-    Task<List<MatiereDTO>> GetMatieresByFiliere(int filiereId);
+    Task<List<MatiereDTOs>> GetMatieresByFiliere(int filiereId);
 }
 
 public class MatiereService : IMatiereService
@@ -22,7 +24,7 @@ public class MatiereService : IMatiereService
         _context = context;
     }
     
-    public async Task<List<MatiereDTO>> GetAllMatieres()
+    public async Task<List<MatiereDTOs>> GetAllMatieres()
     {
         var matieres = await _context.Matieres
             .Include(m => m.PreRequis)
@@ -31,7 +33,7 @@ public class MatiereService : IMatiereService
         return matieres.Select(MapToDTO).ToList();
     }
     
-    public async Task<MatiereDTO?> GetMatiereById(int id)
+    public async Task<MatiereDTOs?> GetMatiereById(int id)
     {
         var matiere = await _context.Matieres
             .Include(m => m.PreRequis)
@@ -40,7 +42,7 @@ public class MatiereService : IMatiereService
         return matiere != null ? MapToDTO(matiere) : null;
     }
     
-    public async Task<MatiereDTO> CreateMatiere(CreateMatiereRequest request)
+    public async Task<MatiereDTOs> CreateMatiere(CreateMatiereRequest request)
     {
         var matiere = new Matiere
         {
@@ -116,7 +118,7 @@ public class MatiereService : IMatiereService
         return true;
     }
     
-    public async Task<List<MatiereDTO>> GetMatieresByFiliere(int filiereId)
+    public async Task<List<MatiereDTOs>> GetMatieresByFiliere(int filiereId)
     {
         // Logique pour récupérer les matières d'une filière
         var matieres = await _context.Matieres
@@ -127,9 +129,9 @@ public class MatiereService : IMatiereService
         return matieres.Select(MapToDTO).ToList();
     }
     
-    private MatiereDTO MapToDTO(Matiere matiere)
+    private MatiereDTOs MapToDTO(Matiere matiere)
     {
-        return new MatiereDTO
+        return new MatiereDTOs
         {
             IdMatiere = matiere.IdMatiere,
             Code = matiere.Code,

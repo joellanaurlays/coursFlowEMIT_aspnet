@@ -1,11 +1,12 @@
 ﻿namespace BackendCoursFlow.Services.EmploiDuTemps;
 
 using Microsoft.EntityFrameworkCore;
-
 using BackendCoursFlow.Donnees;
 using BackendCoursFlow.Models.Utilisateurs;
 using BackendCoursFlow.Models.Pedagogies;
 using BackendCoursFlow.Models.EmploiDuTemps;
+using BackendCoursFlow.Models.Enums;
+using BackendCoursFlow.DTOs;
 
 public class DisponibiliteService
 {
@@ -17,28 +18,59 @@ public class DisponibiliteService
     }
 
     // Récupérer toutes les disponibilités d'un professeur
-    public async Task<List<Disponibilite>> GetByProfesseurAsync(int profId)
+    public async Task<List<DisponibiliteDTOs>> GetByProfesseurAsync(int profId)
     {
-        return await _context.Disponibilites
+        var disponibilites = await _context.Disponibilites
+            .Include(d => d.Professeur)
+                .ThenInclude(p => p.Utilisateur)
             .Where(d => d.IdProf == profId)
             .OrderBy(d => d.Jour)
             .ThenBy(d => d.HeureDebut)
             .ToListAsync();
+
+        return disponibilites.Select(d => new DisponibiliteDTOs
+        {
+            IdDispo = d.IdDispo,
+            Jour = d.Jour.ToString(),
+            HeureDebut = d.HeureDebut.ToString(@"hh\:mm"),
+            HeureFin = d.HeureFin.ToString(@"hh\:mm"),
+            Type = d.Type.ToString(),
+            ProfesseurId = d.IdProf,
+            ProfesseurNom = d.Professeur != null && d.Professeur.Utilisateur != null
+                ? $"{d.Professeur.Utilisateur.Nom} {d.Professeur.Utilisateur.Prenom}"
+                : "Inconnu"
+        }).ToList();
     }
 
     // Ajout d'une disponibilité 
-    public async Task<bool> CreateDisponibiliteAsync(Disponibilite dispo)
+    public async Task<bool> CreateDisponibiliteAsync(CreateDisponibiliteRequest requete, int profId)
     {
-        // Logique de vérification : est-ce que le prof a déjà un créneau qui chevauche avec celui-ci ?
+        if (!Enum.TryParse<JourSemaine>(requete.Jour, true, out var jourParsed) ||
+            !Enum.TryParse<TypeDisponibilite>(requete.Type, true, out var typeParsed) ||
+            !TimeSpan.TryParse(requete.HeureDebut, out var debutParsed) ||
+            !TimeSpan.TryParse(requete.HeureFin, out var finParsed))
+        {
+            return false; // Données invalides
+        }
+
         bool hasConflict = await _context.Disponibilites.AnyAsync(d =>
-            d.IdProf == dispo.IdProf &&
-            d.Jour == dispo.Jour &&
-            ((dispo.HeureDebut >= d.HeureDebut && dispo.HeureDebut < d.HeureFin) ||
-             (dispo.HeureFin > d.HeureDebut && dispo.HeureFin <= d.HeureFin)));
+            d.IdProf == profId &&
+            d.Jour == jourParsed &&
+            ((debutParsed >= d.HeureDebut && debutParsed < d.HeureFin) ||
+             (finParsed > d.HeureDebut && finParsed <= d.HeureFin)));
 
         if (hasConflict) return false;
 
-        _context.Disponibilites.Add(dispo);
+        var nouvelleDisponibilite = new Disponibilite
+        {
+            IdProf = profId,
+            Jour = jourParsed,
+            HeureDebut = debutParsed,
+            HeureFin = finParsed,
+            Type = typeParsed
+        };
+
+        _context.Disponibilites.Add(nouvelleDisponibilite);
         await _context.SaveChangesAsync();
         return true;
     }

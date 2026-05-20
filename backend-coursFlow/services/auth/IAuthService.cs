@@ -1,5 +1,5 @@
 using Microsoft.IdentityModel.Tokens;
-using BackendCoursFlow.Models;
+using BackendCoursFlow.Models.Utilisateurs;
 using BackendCoursFlow.DTOs;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;

@@ -1,5 +1,12 @@
-﻿namespace BackendCoursFlow.Donnees;
+﻿using Microsoft.EntityFrameworkCore;
+using BackendCoursFlow.Models.Utilisateurs; 
+using BackendCoursFlow.Models.Pedagogies;
+using BackendCoursFlow.Models.Salles;
+using BackendCoursFlow.Models.Enums;
+using BackendCoursFlow.Models.EmploiDuTemps;
+using System.ComponentModel.DataAnnotations;
 
+namespace BackendCoursFlow.Donnees;
 
 public class ApplicationDbContext : DbContext
 {
@@ -21,7 +28,9 @@ public class ApplicationDbContext : DbContext
     public DbSet<Salle> Salles { get; set; }
     public DbSet<Disponibilite> Disponibilites { get; set; }
     public DbSet<DisponibiliteSalle> DisponibilitesSalles { get; set; }
+
     public DbSet<EmploiDuTemps> EmploisDuTemps { get; set; }
+
     public DbSet<AnneeUniversitaire> AnneesUniversitaires { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)

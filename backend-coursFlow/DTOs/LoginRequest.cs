@@ -1,4 +1,6 @@
 namespace BackendCoursFlow.DTOs;
+using System.ComponentModel.DataAnnotations;
+
 public class LoginRequest
 {
     [Required, EmailAddress]

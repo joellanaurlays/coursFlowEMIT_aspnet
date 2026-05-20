@@ -1,61 +1,94 @@
-﻿namespace BackendCoursFlow.Controllers.EmploiDuTemps;
-
-using Microsoft.AspNetCore.Mvc;
-using BackendCoursFlow.Models.EmploiDuTemps;
+﻿using Microsoft.AspNetCore.Mvc;
 using BackendCoursFlow.Services.EmploiDuTemps;
+using BackendCoursFlow.DTOs;
+using BackendCoursFlow.Models.EmploiDuTemps;
+
+namespace BackendCoursFlow.Controllers.EmploiDuTemps;
 
 [ApiController]
 [Route("api/[controller]")]
 public class ClasseController : ControllerBase
 {
-	private readonly ClasseService _classeService;
+    private readonly ClasseService _classeService;
 
-	public ClasseController(ClasseService classeService)
-	{
-		_classeService = classeService;
-	}
+    public ClasseController(ClasseService classeService)
+    {
+        _classeService = classeService;
+    }
 
-	// GET
-	[HttpGet]
-	public async Task<ActionResult<List<Classe>>> GetAll()
-	{
-		var classe = await _classeService.GetAllClassesAsync();
-		return Ok(classe);
-	}
+    // GET: api/Classe
+    [HttpGet]
+    public async Task<ActionResult<List<ClasseDTOs>>> GetAll()
+    {
+        var classes = await _classeService.GetAllClassesAsync();
 
+        var result = classes.Select(c => new ClasseDTOs
+        {
+            IdClasse = c.IdClasse,
+            Nom = c.Nom,
+            Niveau = c.Niveau,
+            Groupe = c.Groupe,
+            IdFiliere = c.IdFiliere,
+            NomFiliere = c.Filiere?.Nom ?? "Inconnue"
+        }).ToList();
 
-	[HttpGet("{id}")]
-	public async Task<ActionResult<Classe>> GetById(int id)
-	{
-		var classe = await _classeService.GetClasseWithCoursAsync(id);
+        return Ok(result);
+    }
 
-		if(classe == null)
-		{
-			return NotFound($"La classe avec l'ID {id} n'existe pas.");
-		}
-		return Ok(classe);
-	}
+    // GET: api/Classe/5
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Classe>> GetById(int id)
+    {
+        var classe = await _classeService.GetClasseWithCoursAsync(id);
 
-	[HttpGet("filiere/{filiereId}")]
-	public async Task<ActionResult<List<Classe>>> GetByFiliere(int filiereId)
-	{
-		var classe = await _classeService.GetClassesByFiliereAsync(filiereId);
-		return Ok(classe);
-	}
+        if (classe == null)
+        {
+            return NotFound($"La classe avec l'ID {id} n'existe pas.");
+        }
+        return Ok(classe);
+    }
 
-	// POST
-	[HttpPost]
-	public async Task<IActionResult> Create(Classe classe)
-	{
-		await _classeService.CreateClasseAsync(classe);
-		return CreatedAtAction(nameof(GetById), new { id = classe.IdClasse }, classe);
-	}
+    // GET: api/Classe/filiere/2
+    [HttpGet("filiere/{filiereId}")]
+    public async Task<ActionResult<List<ClasseDTOs>>> GetByFiliere(int filiereId)
+    {
+        var classes = await _classeService.GetClassesByFiliereAsync(filiereId);
 
-	// DELETE
-	[HttpDelete("{id}")]
-	public async Task<IActionResult> Delete(int id)
-	{
-		await _classeService.DeleteClasseAsync(id);
-		return NoContent();
-	}
+        var result = classes.Select(c => new ClasseDTOs
+        {
+            IdClasse = c.IdClasse,
+            Nom = c.Nom,
+            Niveau = c.Niveau,
+            Groupe = c.Groupe,
+            IdFiliere = c.IdFiliere,
+            NomFiliere = c.Filiere?.Nom ?? "Inconnue"
+        }).ToList();
+
+        return Ok(result);
+    }
+
+    // POST: api/Classe
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] CreateClasseRequest request)
+    {
+        var nouvelleClasse = new Classe
+        {
+            Nom = request.Nom,
+            Niveau = request.Niveau,
+            Groupe = request.Groupe,
+            IdFiliere = request.IdFiliere
+        };
+
+        await _classeService.CreateClasseAsync(nouvelleClasse);
+
+        return CreatedAtAction(nameof(GetById), new { id = nouvelleClasse.IdClasse }, nouvelleClasse);
+    }
+
+    // DELETE: api/Classe/5
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        await _classeService.DeleteClasseAsync(id);
+        return NoContent();
+    }
 }

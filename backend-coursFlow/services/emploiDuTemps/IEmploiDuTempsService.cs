@@ -1,16 +1,19 @@
-using BackendCoursFlow.Models;
+using Microsoft.EntityFrameworkCore;
+using BackendCoursFlow.Donnees;
 using BackendCoursFlow.DTOs;
+using BackendCoursFlow.Models.Enums;
+using BackendCoursFlow.Models.Pedagogies;
 namespace BackendCoursFlow.Services.EmploiDuTemps;
 
 public interface IEmploiDuTempsService
 {
-    Task<List<EmploiDuTempsDTO>> GetEmploiByClasse(int classeId, string? semaine = null);
-    Task<List<EmploiDuTempsDTO>> GetEmploiByProfesseur(int professeurId, string? semaine = null);
-    Task<List<EmploiDuTempsDTO>> GetEmploiBySalle(int salleId, string? semaine = null);
-    Task<EmploiDuTempsDTO> CreateEmploi(CreateEmploiDuTempsRequest request);
+    Task<List<EmploiDuTempsDTOs>> GetEmploiByClasse(int classeId, string? semaine = null);
+    Task<List<EmploiDuTempsDTOs>> GetEmploiByProfesseur(int professeurId, string? semaine = null);
+    Task<List<EmploiDuTempsDTOs>> GetEmploiBySalle(int salleId, string? semaine = null);
+    Task<EmploiDuTempsDTOs> CreateEmploi(CreateEmploiDuTempsRequest request);
     Task<bool> UpdateEmploi(int id, CreateEmploiDuTempsRequest request);
     Task<bool> DeleteEmploi(int id);
-    Task<bool> VerifierConflit(CreateEmploiDuTempsRequest request);
+    Task<bool> VerifierConflit(CreateEmploiDuTempsRequest request, int? excludeId = null);
     Task<byte[]> ExporterEmploiPDF(int classeId, string periode);
 }
 
@@ -23,7 +26,7 @@ public class EmploiDuTempsService : IEmploiDuTempsService
         _context = context;
     }
     
-    public async Task<List<EmploiDuTempsDTO>> GetEmploiByClasse(int classeId, string? semaine = null)
+    public async Task<List<EmploiDuTempsDTOs>> GetEmploiByClasse(int classeId, string? semaine = null)
     {
         var query = _context.EmploisDuTemps
             .Include(e => e.Cours)
@@ -47,7 +50,7 @@ public class EmploiDuTempsService : IEmploiDuTempsService
         return emplois.Select(MapToDTO).ToList();
     }
     
-    public async Task<List<EmploiDuTempsDTO>> GetEmploiByProfesseur(int professeurId, string? semaine = null)
+    public async Task<List<EmploiDuTempsDTOs>> GetEmploiByProfesseur(int professeurId, string? semaine = null)
     {
         var query = _context.EmploisDuTemps
             .Include(e => e.Cours)
@@ -71,7 +74,7 @@ public class EmploiDuTempsService : IEmploiDuTempsService
         return emplois.Select(MapToDTO).ToList();
     }
     
-    public async Task<List<EmploiDuTempsDTO>> GetEmploiBySalle(int salleId, string? semaine = null)
+    public async Task<List<EmploiDuTempsDTOs>> GetEmploiBySalle(int salleId, string? semaine = null)
     {
         var query = _context.EmploisDuTemps
             .Include(e => e.Cours)
@@ -95,14 +98,14 @@ public class EmploiDuTempsService : IEmploiDuTempsService
         return emplois.Select(MapToDTO).ToList();
     }
     
-    public async Task<EmploiDuTempsDTO> CreateEmploi(CreateEmploiDuTempsRequest request)
+    public async Task<EmploiDuTempsDTOs> CreateEmploi(CreateEmploiDuTempsRequest request)
     {
         // Vérifier les conflits
         var hasConflict = await VerifierConflit(request);
         if (hasConflict)
             throw new Exception("Conflit détecté dans l'emploi du temps");
             
-        var emploi = new EmploiDuTemps
+        var emploi = new BackendCoursFlow.Models.Pedagogies.EmploiDuTemps
         {
             Jour = Enum.Parse<JourSemaine>(request.Jour),
             HeureDebut = TimeSpan.Parse(request.HeureDebut),
@@ -219,7 +222,7 @@ public class EmploiDuTempsService : IEmploiDuTempsService
         return Array.Empty<byte>();
     }
     
-    private async Task<EmploiDuTempsDTO> GetEmploiById(int id)
+    private async Task<EmploiDuTempsDTOs> GetEmploiById(int id)
     {
         var emploi = await _context.EmploisDuTemps
             .Include(e => e.Cours)
@@ -236,9 +239,9 @@ public class EmploiDuTempsService : IEmploiDuTempsService
         return MapToDTO(emploi);
     }
     
-    private EmploiDuTempsDTO MapToDTO(EmploiDuTemps emploi)
+    private EmploiDuTempsDTOs MapToDTO(BackendCoursFlow.Models.Pedagogies.EmploiDuTemps emploi)
     {
-        return new EmploiDuTempsDTO
+        return new EmploiDuTempsDTOs
         {
             IdEmploi = emploi.IdEmploi,
             Jour = emploi.Jour.ToString(),

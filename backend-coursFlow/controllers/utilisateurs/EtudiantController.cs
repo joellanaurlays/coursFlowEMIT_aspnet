@@ -1,9 +1,7 @@
-﻿namespace BackendCoursFlow.Controllers.Utilisateurs;
-
-using Microsoft.AspNetCore.Mvc;
-using BackendCoursFlow.Models.Utilisateurs;
+﻿using Microsoft.AspNetCore.Mvc;
 using BackendCoursFlow.Services.Utilisateurs;
-
+using BackendCoursFlow.DTOs; 
+namespace BackendCoursFlow.Controllers.Utilisateurs;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -16,17 +14,17 @@ public class EtudiantController : ControllerBase
         _etudiantService = etudiantService;
     }
 
-    // GET all
+    // GET: api/Etudiant
     [HttpGet]
-    public async Task<ActionResult<List<Etudiant>>> GetAll()
+    public async Task<ActionResult<List<UtilisateurDTO>>> GetAll()
     {
         var etudiants = await _etudiantService.GetAllEtudiantsAsync();
         return Ok(etudiants);
     }
 
-    // GET
+    // GET: api/Etudiant/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<Etudiant>> GetById(int id)
+    public async Task<ActionResult<UtilisateurDTO>> GetById(int id)
     {
         var etudiant = await _etudiantService.GetEtudiantByIdAsync(id);
 
@@ -38,16 +36,21 @@ public class EtudiantController : ControllerBase
         return Ok(etudiant);
     }
 
-    // POST
+    // POST: api/Etudiant
     [HttpPost]
-    public async Task<IActionResult> Create(Etudiant etudiant)
+    public async Task<IActionResult> Create(
+        [FromBody] CreateUtilisateurRequest userRequest,
+        [FromQuery] string matricule,
+        [FromQuery] string niveau,
+        [FromQuery] int idFiliere,
+        [FromQuery] int idClasse,
+        [FromQuery] string? groupe = null)
     {
-        await _etudiantService.CreateEtudiantAsync(etudiant);
-
-        return CreatedAtAction(nameof(GetById), new { id = etudiant.IdEtudiant }, etudiant);
+        await _etudiantService.CreateEtudiantWithDtoAsync(userRequest, matricule, niveau, groupe, idFiliere, idClasse);
+        return Ok(new { message = "Étudiant et compte utilisateur créés avec succès." });
     }
 
-    // DELETE
+    // DELETE: api/Etudiant/5
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {

@@ -1,7 +1,10 @@
 namespace BackendCoursFlow.Models.Utilisateurs;
 
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using BackendCoursFlow.Models.Pedagogies;
 
-public class Responsable
+public class Responsable : Utilisateur
 {
     [Key]
     public int IdResp { get; set; }

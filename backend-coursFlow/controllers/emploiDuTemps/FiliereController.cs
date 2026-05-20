@@ -1,8 +1,9 @@
-﻿namespace BackendCoursFlow.Controllers.EmploiDuTemps;
-
-using Microsoft.AspNetCore.Mvc;
-using BackendCoursFlow.Models.EmploiDuTemps;
+﻿using Microsoft.AspNetCore.Mvc;
 using BackendCoursFlow.Services.EmploiDuTemps;
+using BackendCoursFlow.DTOs;
+using BackendCoursFlow.Models.EmploiDuTemps;
+
+namespace BackendCoursFlow.Controllers.EmploiDuTemps;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -15,19 +16,19 @@ public class FiliereController : ControllerBase
         _filiereService = filiereService;
     }
 
-    // GET all
+    // GET: api/Filiere
     [HttpGet]
-    public async Task<ActionResult<List<Filiere>>> GetAll()
+    public async Task<ActionResult<List<FiliereDTO>>> GetAll()
     {
         var filieres = await _filiereService.GetAllFilieresAsync();
         return Ok(filieres);
     }
 
-    // GET
+    // GET: api/Filiere/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<Filiere>> GetById(int id)
+    public async Task<ActionResult<FiliereDTO>> GetById(int id)
     {
-        var filiere = await _filiereService.GetFiliereWithClassesAsync(id);
+        var filiere = await _filiereService.GetFiliereByIdAsync(id);
 
         if (filiere == null)
         {
@@ -37,32 +38,42 @@ public class FiliereController : ControllerBase
         return Ok(filiere);
     }
 
-    // POST
+    // POST: api/Filiere
     [HttpPost]
-    public async Task<IActionResult> Create(Filiere filiere)
+    public async Task<IActionResult> Create([FromBody] CreateFiliereRequest request)
     {
-        await _filiereService.CreateFiliereAsync(filiere);
-        return CreatedAtAction(nameof(GetById), new { id = filiere.IdFiliere }, filiere);
+        var nouvelleFiliere = await _filiereService.CreateFiliereAsync(request);
+        return CreatedAtAction(nameof(GetById), new { id = nouvelleFiliere.IdFiliere }, nouvelleFiliere);
     }
 
-    // PUT
+    // PUT: api/Filiere/5
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, Filiere filiere)
+    public async Task<IActionResult> Update(int id, [FromBody] FiliereDTO filiereDto)
     {
-        if (id != filiere.IdFiliere)
+        if (id != filiereDto.IdFiliere)
         {
-            return BadRequest("L'ID dans l'URL ne correspond pas à l'ID de l'objet.");
+            return BadRequest("L'ID dans l'URL ne correspond pas à l'ID de l'objet fourni.");
         }
 
-        await _filiereService.UpdateFiliereAsync(filiere);
-        return NoContent(); // Réponse standard 204 pour une mise à jour réussie
+        var updated = await _filiereService.UpdateFiliereAsync(id, filiereDto);
+        if (!updated)
+        {
+            return NotFound($"La filière avec l'ID {id} n'existe pas.");
+        }
+
+        return NoContent();
     }
 
-    // DELETE
+    // DELETE: api/Filiere/5
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        await _filiereService.DeleteFiliereAsync(id);
+        var deleted = await _filiereService.DeleteFiliereAsync(id);
+        if (!deleted)
+        {
+            return NotFound($"La filière avec l'ID {id} n'a pas été trouvée.");
+        }
+
         return NoContent();
     }
 }

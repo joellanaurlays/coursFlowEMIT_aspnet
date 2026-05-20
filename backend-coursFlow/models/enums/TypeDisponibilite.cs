@@ -1,6 +1,7 @@
 namespace BackendCoursFlow.Models.Enums;
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
+using System.Text.Json.Serialization;
+
 public enum TypeDisponibilite
 {
     Disponible,
