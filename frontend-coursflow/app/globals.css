@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-black: #16131F;     /* Fonds sombres / Textes principaux */
+  --color-light: #F0D9E4;     /* Fonds clairs / Cartes actives */
+  --color-pink: #C1A0AC;      /* Boutons / Éléments secondaires */
+  --color-purple: #4A3F4B;    /* Sidebar / Headers / Overlays */
+  --color-muted: #806C79;     /* Bordures / Textes secondaires */
+}
+
+body {
+  background: var(--color-black);
+  color: var(--color-light);
+  font-family: Arial, Helvetica, sans-serif;
+}

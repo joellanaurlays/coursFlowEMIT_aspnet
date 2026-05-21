@@ -1,7 +1,7 @@
-namespace BackendCoursFlow.Models.Pedagogies;
-
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
+namespace BackendCoursFlow.Models.Pedagogies;
 
 public class Matiere
 {
