@@ -1,6 +1,5 @@
-﻿namespace BackendCoursFlow.Models.Enums;
-
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+namespace BackendCoursFlow.Models.Enums;
 
 public enum TypeSalle
 {

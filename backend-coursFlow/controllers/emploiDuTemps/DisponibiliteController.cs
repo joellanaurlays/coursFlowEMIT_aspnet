@@ -1,9 +1,7 @@
-﻿namespace BackendCoursFlow.Controllers.EmploiDuTemps;
-
-using Microsoft.AspNetCore.Mvc;
+﻿using BackendCoursFlow.Models.EmploiDuTemps;
 using BackendCoursFlow.DTOs;
 using BackendCoursFlow.Services.EmploiDuTemps;
-using BackendCoursFlow.Models.EmploiDuTemps;
+namespace BackendCoursFlow.Controllers.EmploiDuTemps;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -25,18 +23,19 @@ public class DisponibiliteController : ControllerBase
 	}
 
 	// POST
-	[HttpPost]
-	public async Task<IActionResult> Create(CreateDisponibiliteRequest dispo)
+	[HttpPost("professeur/{profId}")]
+	public async Task<IActionResult> Create(int profId, [FromBody] CreateDisponibiliteRequest dispo)
 	{
-		var success = await _dispoService.CreateDisponibiliteAsync(dispo);
+		var success = await _dispoService.CreateDisponibiliteAsync(dispo, profId);
 
 		if (!success)
 		{
 			return BadRequest("Le professeur a déjà un créneau qui chevauche cette période.");
 		}
+
 		return Ok(new { message = "Disponibilité ajoutée avec succès" });
 	}
-
+	
 	// DELETE
 	[HttpDelete("{id}")]
 	public async Task<IActionResult> Delete(int id)

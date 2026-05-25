@@ -1,9 +1,6 @@
-
-namespace BackendCoursFlow.Models.Utilisateurs;
-
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
+namespace BackendCoursFlow.Models.Utilisateurs;
 public class Admin
 {
     [Key]

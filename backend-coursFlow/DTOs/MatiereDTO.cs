@@ -1,6 +1,6 @@
 namespace BackendCoursFlow.DTOs;
 
-public class MatiereDTOs
+public class MatiereDTO
 {
     public int IdMatiere { get; set; }
     public string Code { get; set; } = string.Empty;

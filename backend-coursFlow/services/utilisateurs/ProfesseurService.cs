@@ -1,10 +1,9 @@
-﻿namespace BackendCoursFlow.Services.Utilisateurs;
-
-using Microsoft.EntityFrameworkCore;
-using BackendCoursFlow.Donnees;
+﻿using BackendCoursFlow.Donnees;
 using BackendCoursFlow.Models.Utilisateurs;
 using BackendCoursFlow.DTOs;
 using BackendCoursFlow.Models.Enums;
+
+namespace BackendCoursFlow.Services.Utilisateurs;
 
 public class ProfesseurService
 {
@@ -54,9 +53,9 @@ public class ProfesseurService
             Nom = userRequest.Nom,
             Prenom = userRequest.Prenom,
             Email = userRequest.Email,
-            Password = userRequest.Password,
+            MotDePasse = userRequest.Password,
             Telephone = userRequest.Telephone,
-            Role = RoleUtilisateur.Professeur,
+            Role = Role.Professeur,
             IsActive = true
         };
 

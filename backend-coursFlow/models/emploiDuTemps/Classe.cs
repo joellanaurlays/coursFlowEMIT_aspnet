@@ -1,11 +1,8 @@
-namespace BackendCoursFlow.Models.EmploiDuTemps;
-
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
+using BackendCoursFlow.Models.Enums;
 using BackendCoursFlow.Models.Pedagogies;
-using BackendCoursFlow.Models.Utilisateurs;
-
+namespace BackendCoursFlow.Models.EmploiDuTemps;
 public class Classe
 {
     [Key]
@@ -17,7 +14,7 @@ public class Classe
 
     [ForeignKey("Filiere")]
     public int IdFiliere { get; set; }
-    public virtual Filiere Filiere { get; set; } = default!;
+    public Filiere? Filiere { get; set; }
 
     // 1 Classe has * Cours
     public virtual ICollection<Cours> Cours { get; set; } = new List<Cours>();

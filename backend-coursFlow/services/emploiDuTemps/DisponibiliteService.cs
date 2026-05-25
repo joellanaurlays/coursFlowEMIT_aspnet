@@ -1,13 +1,10 @@
-﻿namespace BackendCoursFlow.Services.EmploiDuTemps;
-
-using Microsoft.EntityFrameworkCore;
-using BackendCoursFlow.Donnees;
-using BackendCoursFlow.Models.Utilisateurs;
-using BackendCoursFlow.Models.Pedagogies;
+﻿using BackendCoursFlow.Donnees;
 using BackendCoursFlow.Models.EmploiDuTemps;
+using BackendCoursFlow.Models.Utilisateurs;
 using BackendCoursFlow.Models.Enums;
 using BackendCoursFlow.DTOs;
 
+namespace BackendCoursFlow.Services.EmploiDuTemps;
 public class DisponibiliteService
 {
     private readonly ApplicationDbContext _context;

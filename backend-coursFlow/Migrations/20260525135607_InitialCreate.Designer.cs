@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace coursFlow.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260511065400_InitialCreate")]
+    [Migration("20260525135607_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace coursFlow.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.11")
+                .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -72,9 +72,8 @@ namespace coursFlow.Migrations
                     b.Property<int>("IdProf")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Jour")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Jour")
+                        .HasColumnType("integer");
 
                     b.Property<int>("Type")
                         .HasColumnType("integer");
@@ -119,22 +118,22 @@ namespace coursFlow.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int?>("ClasseIdClasse")
+                        .HasColumnType("integer");
+
                     b.Property<int>("Duree")
                         .HasColumnType("integer");
 
-                    b.Property<int>("EmploiDuTempsIdEmploi")
+                    b.Property<int>("MatiereId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("IdClasse")
+                    b.Property<int>("ProfesseurId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("IdMatiere")
+                    b.Property<int?>("ResponsableId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("IdProf")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("IdSalle")
+                    b.Property<int?>("SalleId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Semestre")
@@ -146,15 +145,15 @@ namespace coursFlow.Migrations
 
                     b.HasKey("IdCours");
 
-                    b.HasIndex("EmploiDuTempsIdEmploi");
+                    b.HasIndex("ClasseIdClasse");
 
-                    b.HasIndex("IdClasse");
+                    b.HasIndex("MatiereId");
 
-                    b.HasIndex("IdMatiere");
+                    b.HasIndex("ProfesseurId");
 
-                    b.HasIndex("IdProf");
+                    b.HasIndex("ResponsableId");
 
-                    b.HasIndex("IdSalle");
+                    b.HasIndex("SalleId");
 
                     b.ToTable("Cours");
                 });
@@ -166,6 +165,12 @@ namespace coursFlow.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdEmploi"));
+
+                    b.Property<int>("ClasseId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CoursId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("DateDebut")
                         .HasColumnType("timestamp with time zone");
@@ -182,7 +187,16 @@ namespace coursFlow.Migrations
                     b.Property<int>("Jour")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("ResponsableId")
+                        .HasColumnType("integer");
+
                     b.HasKey("IdEmploi");
+
+                    b.HasIndex("ClasseId");
+
+                    b.HasIndex("CoursId");
+
+                    b.HasIndex("ResponsableId");
 
                     b.ToTable("EmploisDuTemps");
                 });
@@ -197,24 +211,38 @@ namespace coursFlow.Migrations
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
-                    b.Property<int>("Credit")
+                    b.Property<int>("Credits")
                         .HasColumnType("integer");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
 
                     b.Property<string>("Nom")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int?>("ResponsableId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("VolumeHoraireGlobal")
+                        .HasColumnType("integer");
 
                     b.HasKey("IdMatiere");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.HasIndex("ResponsableId");
 
                     b.ToTable("Matieres");
                 });
 
-            modelBuilder.Entity("BackendCoursFlow.Models.Pedagogies.Prerequis", b =>
+            modelBuilder.Entity("BackendCoursFlow.Models.Pedagogies.PreRequis", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -222,19 +250,55 @@ namespace coursFlow.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("IdMatiere")
+                    b.Property<int>("MatiereId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("IdMatierePrerequis")
+                    b.Property<int>("MatierePrerequisId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdMatiere");
+                    b.HasIndex("MatiereId");
 
-                    b.HasIndex("IdMatierePrerequis");
+                    b.HasIndex("MatierePrerequisId");
 
-                    b.ToTable("Prerequis");
+                    b.ToTable("PreRequis");
+                });
+
+            modelBuilder.Entity("BackendCoursFlow.Models.Salles.DisponibiliteSalle", b =>
+                {
+                    b.Property<int>("IdDispoSalle")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdDispoSalle"));
+
+                    b.Property<DateTime>("DateDebut")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("DateFin")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<TimeSpan>("HeureDebut")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan>("HeureFin")
+                        .HasColumnType("interval");
+
+                    b.Property<int>("Jour")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SalleId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.HasKey("IdDispoSalle");
+
+                    b.HasIndex("SalleId");
+
+                    b.ToTable("DisponibilitesSalles");
                 });
 
             modelBuilder.Entity("BackendCoursFlow.Models.Salles.Salle", b =>
@@ -246,15 +310,19 @@ namespace coursFlow.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdSalle"));
 
                     b.Property<string>("Batiment")
-                        .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("Capacite")
                         .HasColumnType("integer");
 
+                    b.Property<bool>("EstDisponible")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Nom")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("Type")
                         .HasColumnType("integer");
@@ -262,6 +330,25 @@ namespace coursFlow.Migrations
                     b.HasKey("IdSalle");
 
                     b.ToTable("Salles");
+                });
+
+            modelBuilder.Entity("BackendCoursFlow.Models.Utilisateurs.Admin", b =>
+                {
+                    b.Property<int>("IdAdmin")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdAdmin"));
+
+                    b.Property<int>("UtilisateurId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("IdAdmin");
+
+                    b.HasIndex("UtilisateurId")
+                        .IsUnique();
+
+                    b.ToTable("Admins");
                 });
 
             modelBuilder.Entity("BackendCoursFlow.Models.Utilisateurs.Utilisateur", b =>
@@ -275,9 +362,18 @@ namespace coursFlow.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .HasColumnType("character varying(13)");
+
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("MotDePasse")
                         .IsRequired()
@@ -285,38 +381,34 @@ namespace coursFlow.Migrations
 
                     b.Property<string>("Nom")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("Prenom")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Telephone")
-                        .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Email")
+                        .IsUnique();
+
                     b.ToTable("Utilisateurs");
 
-                    b.UseTptMappingStrategy();
-                });
+                    b.HasDiscriminator<string>("Discriminator").HasValue("Utilisateur");
 
-            modelBuilder.Entity("BackendCoursFlow.Models.Utilisateurs.Admin", b =>
-                {
-                    b.HasBaseType("BackendCoursFlow.Models.Utilisateurs.Utilisateur");
-
-                    b.Property<int>("IdAdmin")
-                        .HasColumnType("integer");
-
-                    b.ToTable("Admins", (string)null);
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("BackendCoursFlow.Models.Utilisateurs.Etudiant", b =>
@@ -356,9 +448,19 @@ namespace coursFlow.Migrations
 
                     b.HasIndex("FiliereIdFiliere");
 
-                    b.HasIndex("UtilisateurId");
+                    b.HasIndex("Matricule")
+                        .IsUnique();
 
-                    b.ToTable("Etudiants", (string)null);
+                    b.HasIndex("UtilisateurId")
+                        .IsUnique();
+
+                    b.ToTable("Utilisateurs", t =>
+                        {
+                            t.Property("UtilisateurId")
+                                .HasColumnName("Etudiant_UtilisateurId");
+                        });
+
+                    b.HasDiscriminator().HasValue("Etudiant");
                 });
 
             modelBuilder.Entity("BackendCoursFlow.Models.Utilisateurs.Professeur", b =>
@@ -379,19 +481,29 @@ namespace coursFlow.Migrations
                     b.Property<int>("UtilisateurId")
                         .HasColumnType("integer");
 
-                    b.HasIndex("UtilisateurId");
+                    b.HasIndex("UtilisateurId")
+                        .IsUnique();
 
-                    b.ToTable("Professeurs", (string)null);
+                    b.ToTable("Utilisateurs", t =>
+                        {
+                            t.Property("UtilisateurId")
+                                .HasColumnName("Professeur_UtilisateurId");
+                        });
+
+                    b.HasDiscriminator().HasValue("Professeur");
                 });
 
             modelBuilder.Entity("BackendCoursFlow.Models.Utilisateurs.Responsable", b =>
                 {
                     b.HasBaseType("BackendCoursFlow.Models.Utilisateurs.Utilisateur");
 
-                    b.Property<int>("IdResp")
+                    b.Property<int>("UtilisateurId")
                         .HasColumnType("integer");
 
-                    b.ToTable("Responsables", (string)null);
+                    b.HasIndex("UtilisateurId")
+                        .IsUnique();
+
+                    b.HasDiscriminator().HasValue("Responsable");
                 });
 
             modelBuilder.Entity("BackendCoursFlow.Models.EmploiDuTemps.Classe", b =>
@@ -418,39 +530,29 @@ namespace coursFlow.Migrations
 
             modelBuilder.Entity("BackendCoursFlow.Models.Pedagogies.Cours", b =>
                 {
-                    b.HasOne("BackendCoursFlow.Models.Pedagogies.EmploiDuTemps", "EmploiDuTemps")
+                    b.HasOne("BackendCoursFlow.Models.EmploiDuTemps.Classe", null)
                         .WithMany("Cours")
-                        .HasForeignKey("EmploiDuTempsIdEmploi")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BackendCoursFlow.Models.EmploiDuTemps.Classe", "Classe")
-                        .WithMany("Cours")
-                        .HasForeignKey("IdClasse")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ClasseIdClasse");
 
                     b.HasOne("BackendCoursFlow.Models.Pedagogies.Matiere", "Matiere")
                         .WithMany("Cours")
-                        .HasForeignKey("IdMatiere")
+                        .HasForeignKey("MatiereId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BackendCoursFlow.Models.Utilisateurs.Professeur", "Professeur")
                         .WithMany("Cours")
-                        .HasForeignKey("IdProf")
+                        .HasForeignKey("ProfesseurId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("BackendCoursFlow.Models.Utilisateurs.Responsable", null)
+                        .WithMany("Cours")
+                        .HasForeignKey("ResponsableId");
 
                     b.HasOne("BackendCoursFlow.Models.Salles.Salle", "Salle")
                         .WithMany("Cours")
-                        .HasForeignKey("IdSalle")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Classe");
-
-                    b.Navigation("EmploiDuTemps");
+                        .HasForeignKey("SalleId");
 
                     b.Navigation("Matiere");
 
@@ -459,18 +561,48 @@ namespace coursFlow.Migrations
                     b.Navigation("Salle");
                 });
 
-            modelBuilder.Entity("BackendCoursFlow.Models.Pedagogies.Prerequis", b =>
+            modelBuilder.Entity("BackendCoursFlow.Models.Pedagogies.EmploiDuTemps", b =>
+                {
+                    b.HasOne("BackendCoursFlow.Models.EmploiDuTemps.Classe", "Classe")
+                        .WithMany()
+                        .HasForeignKey("ClasseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BackendCoursFlow.Models.Pedagogies.Cours", "Cours")
+                        .WithMany("EmploisDuTemps")
+                        .HasForeignKey("CoursId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BackendCoursFlow.Models.Utilisateurs.Responsable", null)
+                        .WithMany("EmploisDuTemps")
+                        .HasForeignKey("ResponsableId");
+
+                    b.Navigation("Classe");
+
+                    b.Navigation("Cours");
+                });
+
+            modelBuilder.Entity("BackendCoursFlow.Models.Pedagogies.Matiere", b =>
+                {
+                    b.HasOne("BackendCoursFlow.Models.Utilisateurs.Responsable", null)
+                        .WithMany("Matieres")
+                        .HasForeignKey("ResponsableId");
+                });
+
+            modelBuilder.Entity("BackendCoursFlow.Models.Pedagogies.PreRequis", b =>
                 {
                     b.HasOne("BackendCoursFlow.Models.Pedagogies.Matiere", "Matiere")
-                        .WithMany("Prerequis")
-                        .HasForeignKey("IdMatiere")
+                        .WithMany("PreRequis")
+                        .HasForeignKey("MatiereId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BackendCoursFlow.Models.Pedagogies.Matiere", "MatierePrerequis")
-                        .WithMany()
-                        .HasForeignKey("IdMatierePrerequis")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .WithMany("PreRequisPour")
+                        .HasForeignKey("MatierePrerequisId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Matiere");
@@ -478,13 +610,26 @@ namespace coursFlow.Migrations
                     b.Navigation("MatierePrerequis");
                 });
 
-            modelBuilder.Entity("BackendCoursFlow.Models.Utilisateurs.Admin", b =>
+            modelBuilder.Entity("BackendCoursFlow.Models.Salles.DisponibiliteSalle", b =>
                 {
-                    b.HasOne("BackendCoursFlow.Models.Utilisateurs.Utilisateur", null)
-                        .WithOne()
-                        .HasForeignKey("BackendCoursFlow.Models.Utilisateurs.Admin", "Id")
+                    b.HasOne("BackendCoursFlow.Models.Salles.Salle", "Salle")
+                        .WithMany("Disponibilites")
+                        .HasForeignKey("SalleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Salle");
+                });
+
+            modelBuilder.Entity("BackendCoursFlow.Models.Utilisateurs.Admin", b =>
+                {
+                    b.HasOne("BackendCoursFlow.Models.Utilisateurs.Utilisateur", "Utilisateur")
+                        .WithOne("Admin")
+                        .HasForeignKey("BackendCoursFlow.Models.Utilisateurs.Admin", "UtilisateurId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Utilisateur");
                 });
 
             modelBuilder.Entity("BackendCoursFlow.Models.Utilisateurs.Etudiant", b =>
@@ -501,15 +646,9 @@ namespace coursFlow.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BackendCoursFlow.Models.Utilisateurs.Utilisateur", null)
-                        .WithOne()
-                        .HasForeignKey("BackendCoursFlow.Models.Utilisateurs.Etudiant", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("BackendCoursFlow.Models.Utilisateurs.Utilisateur", "Utilisateur")
-                        .WithMany()
-                        .HasForeignKey("UtilisateurId")
+                        .WithOne("Etudiant")
+                        .HasForeignKey("BackendCoursFlow.Models.Utilisateurs.Etudiant", "UtilisateurId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -522,15 +661,9 @@ namespace coursFlow.Migrations
 
             modelBuilder.Entity("BackendCoursFlow.Models.Utilisateurs.Professeur", b =>
                 {
-                    b.HasOne("BackendCoursFlow.Models.Utilisateurs.Utilisateur", null)
-                        .WithOne()
-                        .HasForeignKey("BackendCoursFlow.Models.Utilisateurs.Professeur", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("BackendCoursFlow.Models.Utilisateurs.Utilisateur", "Utilisateur")
-                        .WithMany()
-                        .HasForeignKey("UtilisateurId")
+                        .WithOne("Professeur")
+                        .HasForeignKey("BackendCoursFlow.Models.Utilisateurs.Professeur", "UtilisateurId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -539,11 +672,13 @@ namespace coursFlow.Migrations
 
             modelBuilder.Entity("BackendCoursFlow.Models.Utilisateurs.Responsable", b =>
                 {
-                    b.HasOne("BackendCoursFlow.Models.Utilisateurs.Utilisateur", null)
-                        .WithOne()
-                        .HasForeignKey("BackendCoursFlow.Models.Utilisateurs.Responsable", "Id")
+                    b.HasOne("BackendCoursFlow.Models.Utilisateurs.Utilisateur", "Utilisateur")
+                        .WithOne("Responsable")
+                        .HasForeignKey("BackendCoursFlow.Models.Utilisateurs.Responsable", "UtilisateurId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Utilisateur");
                 });
 
             modelBuilder.Entity("BackendCoursFlow.Models.EmploiDuTemps.Classe", b =>
@@ -558,21 +693,36 @@ namespace coursFlow.Migrations
                     b.Navigation("Etudiants");
                 });
 
-            modelBuilder.Entity("BackendCoursFlow.Models.Pedagogies.EmploiDuTemps", b =>
+            modelBuilder.Entity("BackendCoursFlow.Models.Pedagogies.Cours", b =>
                 {
-                    b.Navigation("Cours");
+                    b.Navigation("EmploisDuTemps");
                 });
 
             modelBuilder.Entity("BackendCoursFlow.Models.Pedagogies.Matiere", b =>
                 {
                     b.Navigation("Cours");
 
-                    b.Navigation("Prerequis");
+                    b.Navigation("PreRequis");
+
+                    b.Navigation("PreRequisPour");
                 });
 
             modelBuilder.Entity("BackendCoursFlow.Models.Salles.Salle", b =>
                 {
                     b.Navigation("Cours");
+
+                    b.Navigation("Disponibilites");
+                });
+
+            modelBuilder.Entity("BackendCoursFlow.Models.Utilisateurs.Utilisateur", b =>
+                {
+                    b.Navigation("Admin");
+
+                    b.Navigation("Etudiant");
+
+                    b.Navigation("Professeur");
+
+                    b.Navigation("Responsable");
                 });
 
             modelBuilder.Entity("BackendCoursFlow.Models.Utilisateurs.Professeur", b =>
@@ -580,6 +730,15 @@ namespace coursFlow.Migrations
                     b.Navigation("Cours");
 
                     b.Navigation("Disponibilites");
+                });
+
+            modelBuilder.Entity("BackendCoursFlow.Models.Utilisateurs.Responsable", b =>
+                {
+                    b.Navigation("Cours");
+
+                    b.Navigation("EmploisDuTemps");
+
+                    b.Navigation("Matieres");
                 });
 #pragma warning restore 612, 618
         }

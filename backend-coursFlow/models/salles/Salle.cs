@@ -1,8 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using BackendCoursFlow.Models.Enums;
 using BackendCoursFlow.Models.Pedagogies;
-
-namespace BackendCoursFlow.Models.Salles;
+namespace BackendCoursFlow.Models.Salles; 
 
 public class Salle
 {

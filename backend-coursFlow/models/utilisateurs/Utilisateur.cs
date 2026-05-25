@@ -1,8 +1,8 @@
-
 using System.ComponentModel.DataAnnotations;
 using BackendCoursFlow.Models.Enums;
 
-namespace BackendCoursFlow.Models.Utilisateurs;
+namespace BackendCoursFlow.Models.Utilisateurs;  
+
 
 public class Utilisateur
 {

@@ -1,15 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using BackendCoursFlow.Services.Utilisateurs;
-using BackendCoursFlow.DTOs; 
+﻿using BackendCoursFlow.Services.Utilisateurs;
+using BackendCoursFlow.DTOs;
 namespace BackendCoursFlow.Controllers.Utilisateurs;
 
 [ApiController]
 [Route("api/[controller]")]
 public class EtudiantController : ControllerBase
 {
-    private readonly EtudiantService _etudiantService;
+    private readonly IUtilisateurService _etudiantService;
 
-    public EtudiantController(EtudiantService etudiantService)
+    public EtudiantController(IUtilisateurService etudiantService)
     {
         _etudiantService = etudiantService;
     }

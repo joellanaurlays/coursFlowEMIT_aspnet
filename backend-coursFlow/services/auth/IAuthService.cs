@@ -6,6 +6,9 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using BackendCoursFlow.Donnees;
+using BackendCoursFlow.Models;
+using BackendCoursFlow.DTOs.Auth;
+using BackendCoursFlow.Models.Enums;
 
 namespace BackendCoursFlow.Services.Auth;
 
@@ -15,6 +18,7 @@ public interface IAuthService
     Task<Utilisateur> Register(RegisterRequest request);
     string GenerateJwtToken(Utilisateur user);
     Task<bool> Logout(int userId);
+
 }
 
 public class AuthService : IAuthService
@@ -74,16 +78,16 @@ public class AuthService : IAuthService
         // Créer l'entité correspondante selon le rôle
         switch (user.Role)
         {
-            case Role.ADMIN:
+            case Role.Admin:
                 _context.Admins.Add(new Admin { UtilisateurId = user.Id });
                 break;
-            case Role.RESPONSABLE:
+            case Role.Responsable:
                 _context.Responsables.Add(new Responsable { UtilisateurId = user.Id });
                 break;
-            case Role.PROFESSEUR:
+            case Role.Professeur:
                 _context.Professeurs.Add(new Professeur { UtilisateurId = user.Id });
                 break;
-            case Role.ETUDIANT:
+            case Role.Etudiant:
                 _context.Etudiants.Add(new Etudiant { UtilisateurId = user.Id });
                 break;
         }

@@ -1,6 +1,7 @@
-using EDTBackend.Services;
-using EDTBackend.DTOs;
-
+using BackendCoursFlow.Services.Auth;
+using BackendCoursFlow.Models;
+using BackendCoursFlow.DTOs.Auth;
+using Microsoft.AspNetCore.Mvc;
 namespace BackendCoursFlow.Controllers.Auth;
 
 [ApiController]

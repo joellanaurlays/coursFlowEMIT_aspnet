@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using BackendCoursFlow.Models.Utilisateurs;
 using BackendCoursFlow.Services.Utilisateurs;
-using BackendCoursFlow.DTOs; 
+using BackendCoursFlow.DTOs;
+using BackendCoursFlow.Models.Utilisateurs;
 
 namespace BackendCoursFlow.Controllers.Utilisateurs;
 

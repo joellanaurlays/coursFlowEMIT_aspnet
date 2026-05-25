@@ -1,11 +1,9 @@
-namespace BackendCoursFlow.Models.Enums;
-
-using System.Text.Json.Serialization;
+namespace BackendCoursFlow.Models.Enums; 
 
 public enum Role
 {
-    ADMIN,
-    RESPONSABLE,
-    PROFESSEUR,
-    ETUDIANT
+    Admin,
+    Responsable,
+    Professeur,
+    Etudiant
 }

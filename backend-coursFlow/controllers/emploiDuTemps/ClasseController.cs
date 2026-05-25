@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿namespace BackendCoursFlow.Controllers.EmploiDuTemps;
+
 using BackendCoursFlow.Services.EmploiDuTemps;
 using BackendCoursFlow.DTOs;
 using BackendCoursFlow.Models.EmploiDuTemps;
-
-namespace BackendCoursFlow.Controllers.EmploiDuTemps;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -29,7 +28,7 @@ public class ClasseController : ControllerBase
             Niveau = c.Niveau,
             Groupe = c.Groupe,
             IdFiliere = c.IdFiliere,
-            NomFiliere = c.Filiere?.Nom ?? "Inconnue"
+            NomFiliere = c.NomFiliere ?? "Inconnue"
         }).ToList();
 
         return Ok(result);
@@ -61,7 +60,7 @@ public class ClasseController : ControllerBase
             Niveau = c.Niveau,
             Groupe = c.Groupe,
             IdFiliere = c.IdFiliere,
-            NomFiliere = c.Filiere?.Nom ?? "Inconnue"
+            NomFiliere = c.NomFiliere != null ? c.NomFiliere: "Inconnue"
         }).ToList();
 
         return Ok(result);
@@ -69,7 +68,7 @@ public class ClasseController : ControllerBase
 
     // POST: api/Classe
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateClasseRequest request)
+    public async Task<IActionResult> CreateClasseAsync([FromBody] CreateClasseRequest request)
     {
         var nouvelleClasse = new Classe
         {
@@ -79,7 +78,7 @@ public class ClasseController : ControllerBase
             IdFiliere = request.IdFiliere
         };
 
-        await _classeService.CreateClasseAsync(nouvelleClasse);
+        await _classeService.CreateClasseAsync(request);
 
         return CreatedAtAction(nameof(GetById), new { id = nouvelleClasse.IdClasse }, nouvelleClasse);
     }

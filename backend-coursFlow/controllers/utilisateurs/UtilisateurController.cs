@@ -1,8 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
-using BackendCoursFlow.Services;
+using BackendCoursFlow.Services.Utilisateurs;
 using BackendCoursFlow.DTOs;
 
-namespace BackendCoursFlow.Controllers.utilisateurs;
+namespace BackendCoursFlow.Controllers.Utilisateurs;
 
 [ApiController]
 [Route("api/[controller]")]

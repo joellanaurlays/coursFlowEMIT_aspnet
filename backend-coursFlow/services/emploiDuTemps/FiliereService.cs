@@ -1,9 +1,8 @@
-﻿namespace BackendCoursFlow.Services.EmploiDuTemps;
-
-using Microsoft.EntityFrameworkCore;
-using BackendCoursFlow.Donnees;
-using BackendCoursFlow.Models.EmploiDuTemps;
+﻿using BackendCoursFlow.Models.EmploiDuTemps;
 using BackendCoursFlow.DTOs;
+using BackendCoursFlow.Donnees;
+
+namespace BackendCoursFlow.Services.EmploiDuTemps;
 
 public class FiliereService
 {

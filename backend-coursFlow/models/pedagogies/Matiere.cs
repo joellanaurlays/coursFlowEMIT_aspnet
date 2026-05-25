@@ -1,7 +1,7 @@
-namespace BackendCoursFlow.Models.Pedagogies;
-
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
+namespace BackendCoursFlow.Models.Pedagogies;  
 
 public class Matiere
 {
@@ -23,7 +23,9 @@ public class Matiere
     
     // Navigation properties
     public virtual ICollection<Cours> Cours { get; set; } = new List<Cours>();
+   [InverseProperty("Matiere")]  // Spécifie que cette collection correspond à Matiere dans PreRequis
     public virtual ICollection<PreRequis> PreRequis { get; set; } = new List<PreRequis>();
+    [InverseProperty("MatierePrerequis")]
     public virtual ICollection<PreRequis> PreRequisPour { get; set; } = new List<PreRequis>();
     
     public void AjouterMatiere() { }

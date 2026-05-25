@@ -12,8 +12,8 @@ public class Professeur : Utilisateur
 {
     public int IdProf { get; set; }
 
-    public required string Grade { get; set; }
-    public required string Specialite { get; set; }
+    public string Grade { get; set; } = "";
+    public string Specialite { get; set; } = "";
 
     public int UtilisateurId { get; set; }
     public virtual Utilisateur Utilisateur { get; set; } = default!;
