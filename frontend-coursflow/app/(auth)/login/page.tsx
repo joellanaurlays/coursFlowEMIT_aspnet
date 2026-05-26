@@ -1,8 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+// Définir le type pour l'erreur
+interface ApiError {
+  message?: string;
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+}
 
 export default function AuthPage() {
+  const router = useRouter();
+  
   // Mode actif : 'login' ou 'register'
   const [mode, setMode] = useState<"login" | "register">("login");
 
@@ -11,15 +24,114 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [nomComplet, setNomComplet] = useState("");
   const [roleSOUHAITE, setRoleSouhaite] = useState("0"); // 0: Étudiant, 1: Professeur
+  
+  // États pour les messages d'erreur et chargement
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Extraire prénom et nom à partir du nom complet
+  const extractPrenomNom = (nomComplet: string) => {
+    const parts = nomComplet.trim().split(" ");
+    if (parts.length === 1) {
+      return { prenom: parts[0], nom: parts[0] };
+    }
+    const prenom = parts[0];
+    const nom = parts.slice(1).join(" ");
+    return { prenom, nom };
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (mode === "login") {
-      alert(`Connexion en cours pour : ${email}`);
-      // Appeler ici ton API ASP.NET Core : /api/auth/login
-    } else {
-      alert(`Inscription de ${nomComplet} (${email}) en tant que ${roleSOUHAITE === "0" ? "Étudiant" : "Enseignant"}`);
-      // Appeler ici ton API ASP.NET Core : /api/auth/register
+    setError("");
+    setIsLoading(true);
+
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
+    try {
+      if (mode === "login") {
+        // ========== CONNEXION ==========
+        const response = await fetch(`${API_URL}/Auth/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Erreur de connexion");
+        }
+
+        // Stocker le token et les infos utilisateur
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify({
+          id: data.userId,
+          nom: data.nom,
+          prenom: data.prenom,
+          email: data.email,
+          role: data.role,
+        }));
+
+        // Redirection selon le rôle
+        if (data.role === "ADMIN") {
+          router.push("/dashboard/admin");
+        } else if (data.role === "RESPONSABLE") {
+          router.push("/dashboard/responsable");
+        } else if (data.role === "PROFESSEUR") {
+          router.push("/dashboard/professeur");
+        } else {
+          router.push("/dashboard/etudiant");
+        }
+      } 
+      else {
+        // ========== INSCRIPTION ==========
+        const { prenom, nom } = extractPrenomNom(nomComplet);
+        const role = roleSOUHAITE === "0" ? "ETUDIANT" : "PROFESSEUR";
+
+        const registerData = {
+          nom: nom,
+          prenom: prenom,
+          email: email,
+          password: password,
+          telephone: "",
+          role: role,
+        };
+
+        const response = await fetch(`${API_URL}/Auth/register`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(registerData),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Erreur lors de l'inscription");
+        }
+
+        // Inscription réussie, passer en mode login
+        alert("Compte créé avec succès ! Veuillez vous connecter.");
+        setMode("login");
+        setEmail("");
+        setPassword("");
+        setNomComplet("");
+        setRoleSouhaite("0");
+      }
+    } catch (err: unknown) {
+      // Typage correct de l'erreur sans 'any'
+      if (err instanceof Error) {
+        setError(err.message);
+      } else if (typeof err === "object" && err !== null && "message" in err) {
+        setError((err as { message: string }).message);
+      } else {
+        setError("Une erreur inattendue s'est produite");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -28,6 +140,13 @@ export default function AuthPage() {
       {/* --- CARTE D'AUTHENTIFICATION --- */}
       <div className="bg-purple/20 border border-muted/20 w-full max-w-md rounded-2xl p-8 backdrop-blur-md shadow-2xl space-y-6 relative">
         
+        {/* AFFICHAGE DES ERREURS */}
+        {error && (
+          <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-3 text-center">
+            <p className="text-red-300 text-sm">{error}</p>
+          </div>
+        )}
+
         {/* LOGO / TITRE */}
         <div className="text-center space-y-1">
           <h1 className="text-3xl font-extrabold text-white tracking-tight">
@@ -109,9 +228,10 @@ export default function AuthPage() {
           {/* BOUTON DE SOUMISSION DYNAMIQUE */}
           <button
             type="submit"
-            className="w-full bg-pink text-black font-bold py-3 rounded-xl text-sm hover:bg-white transition-all shadow-lg mt-2 cursor-pointer"
+            disabled={isLoading}
+            className="w-full bg-pink text-black font-bold py-3 rounded-xl text-sm hover:bg-white transition-all shadow-lg mt-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {mode === "login" ? " Se connecter" : " Créer mon compte"}
+            {isLoading ? "Chargement..." : (mode === "login" ? " Se connecter" : " Créer mon compte")}
           </button>
         </form>
 
@@ -122,7 +242,10 @@ export default function AuthPage() {
               Nouveau ?{" "}
               <button
                 type="button"
-                onClick={() => setMode("register")}
+                onClick={() => {
+                  setMode("register");
+                  setError("");
+                }}
                 className="text-pink font-semibold hover:underline cursor-pointer"
               >
                 Créer un compte
@@ -133,7 +256,10 @@ export default function AuthPage() {
               Vous avez déjà un compte ?{" "}
               <button
                 type="button"
-                onClick={() => setMode("login")}
+                onClick={() => {
+                  setMode("login");
+                  setError("");
+                }}
                 className="text-pink font-semibold hover:underline cursor-pointer"
               >
                 Se connecter

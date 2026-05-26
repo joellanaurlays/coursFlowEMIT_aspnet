@@ -1,6 +1,13 @@
 import Sidebar from "./components/sidebar";
+import type { Metadata } from 'next';
+import './globals.css';
 
-export default function DashboardLayout({
+export const metadata: Metadata = {
+  title: 'CoursFlow - Gestion d\'Emploi du Temps',
+  description: 'Application de gestion d\'emploi du temps',
+};
+
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
