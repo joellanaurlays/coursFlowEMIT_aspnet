@@ -1,23 +1,130 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface UtilisateurProps {
   filtreRecherche: string;
+  refreshTrigger?: number;
 }
 
-// Données fictives calquées sur ton architecture (Filières et Groupes de l'EMIT)
-const FAUX_ETUDIANTS = [
-  { id: 1, matricule: "2401-MISA", nom: "RALAIVAO Jean", filiere: "Informatique (MISA)", classe: "L3 G1", statut: "Inscrit" },
-  { id: 2, matricule: "2402-MISA", nom: "RASOA Marie Lou", filiere: "Informatique (MISA)", classe: "L3 G1", statut: "Inscrit" },
-  { id: 3, matricule: "2405-ELEC", nom: "ANDRIA Guillaume", filiere: "Électronique", classe: "M1 Unique", statut: "En attente" },
-  { id: 4, matricule: "2412-MISA", nom: "RANDRIA Toky", filiere: "Informatique (MISA)", classe: "L3 G2", statut: "Inscrit" },
-];
+interface EtudiantData {
+  id: number;
+  matricule: string;
+  nom: string;
+  prenom: string;
+  email: string;
+  filiere?: string;
+  classe?: string;
+  niveau?: string;
+  groupe?: string;
+  isActive: boolean;
+}
 
-export default function Etudiant({ filtreRecherche }: UtilisateurProps) {
+export default function Etudiant({ filtreRecherche, refreshTrigger = 0 }: UtilisateurProps) {
+  const [etudiants, setEtudiants] = useState<EtudiantData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+  const router = useRouter();
+
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
+  const fetchEtudiants = async () => {
+    setIsLoading(true);
+    setError("");
+    
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/login");
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/Etudiant`, {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          router.push("/login");
+          return;
+        }
+        throw new Error("Erreur lors du chargement des étudiants");
+      }
+
+      const data = await response.json();
+      setEtudiants(data);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Une erreur est survenue");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEtudiants();
+  }, [refreshTrigger]);
+
   // Filtrage en temps réel selon la recherche (Nom ou Matricule)
-  const etudiantsFiltrés = FAUX_ETUDIANTS.filter((etudiant) =>
+  const etudiantsFiltrés = etudiants.filter((etudiant) =>
     etudiant.nom.toLowerCase().includes(filtreRecherche.toLowerCase()) ||
+    etudiant.prenom.toLowerCase().includes(filtreRecherche.toLowerCase()) ||
     etudiant.matricule.toLowerCase().includes(filtreRecherche.toLowerCase())
   );
+
+  const handleDesinscrire = async (id: number) => {
+    if (!confirm("Êtes-vous sûr de vouloir désinscrire cet étudiant ?")) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${API_URL}/Etudiant/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Erreur lors de la suppression");
+      
+      alert("Étudiant désinscrit avec succès");
+      fetchEtudiants();
+    } catch (err) {
+      alert("Erreur lors de la suppression");
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="bg-purple/20 border border-muted/20 rounded-2xl p-8 text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink mx-auto"></div>
+        <p className="text-light/50 mt-2">Chargement...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-purple/20 border border-muted/20 rounded-2xl p-8 text-center">
+        <p className="text-red-400">{error}</p>
+        <button 
+          onClick={fetchEtudiants}
+          className="mt-4 text-pink hover:underline"
+        >
+          Réessayer
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-purple/20 border border-muted/20 rounded-2xl overflow-hidden">
@@ -36,37 +143,36 @@ export default function Etudiant({ filtreRecherche }: UtilisateurProps) {
           {etudiantsFiltrés.length > 0 ? (
             etudiantsFiltrés.map((etudiant) => (
               <tr key={etudiant.id} className="hover:bg-black/10 transition-colors">
-                {/* Matricule style Code/Mono */}
                 <td className="p-4 font-mono text-pink font-medium">{etudiant.matricule}</td>
-                
-                {/* Nom complet */}
-                <td className="p-4 font-semibold text-white">{etudiant.nom}</td>
-                
-                {/* Filière */}
-                <td className="p-4 text-light/70">{etudiant.filiere}</td>
-                
-                {/* Badge de Classe */}
+                <td className="p-4 font-semibold text-white">{etudiant.prenom} {etudiant.nom}</td>
+                <td className="p-4 text-light/70">{etudiant.filiere || "-"}</td>
                 <td className="p-4">
                   <span className="bg-purple/60 px-2 py-1 rounded-lg text-xs text-white border border-muted/20">
-                    {etudiant.classe}
+                    {etudiant.classe || `${etudiant.niveau || ""} ${etudiant.groupe || ""}`}
                   </span>
                 </td>
-                
-                {/* Statut d'inscription */}
                 <td className="p-4">
                   <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    etudiant.statut === "Inscrit" 
+                    etudiant.isActive 
                       ? "bg-green-500/10 text-green-400 border border-green-500/20" 
                       : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
                   }`}>
-                    {etudiant.statut}
+                    {etudiant.isActive ? "Inscrit" : "En attente"}
                   </span>
                 </td>
-                
-                {/* Boutons d'action */}
                 <td className="p-4 text-right space-x-3">
-                  <button className="text-light/50 hover:text-white transition-colors">Dossier</button>
-                  <button className="text-red-400 hover:underline">Désinscrire</button>
+                  <button 
+                    onClick={() => router.push(`/utilisateurs/etudiant/${etudiant.id}`)}
+                    className="text-light/50 hover:text-white transition-colors"
+                  >
+                    Dossier
+                  </button>
+                  <button 
+                    onClick={() => handleDesinscrire(etudiant.id)}
+                    className="text-red-400 hover:underline"
+                  >
+                    Désinscrire
+                  </button>
                 </td>
               </tr>
             ))

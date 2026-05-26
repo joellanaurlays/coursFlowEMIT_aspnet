@@ -1,16 +1,68 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Etudiant from "./etudiant";
 import Professeur from "./professeur";
 import Responsable from "./responsable";
 
 export default function UtilisateursPage() {
-  // Gestion de la bascule entre les types d'utilisateurs
+  const router = useRouter();
   const [roleActif, setRoleActif] = useState<"etudiants" | "professeurs" | "responsables">("etudiants");
-  
-  // Recherche globale (optionnelle mais super pratique pour de longs tableaux)
   const [recherche, setRecherche] = useState("");
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [isCreating, setIsCreating] = useState(false);
+
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
+  const handleCreateUser = async () => {
+    setIsCreating(true);
+    
+    if (roleActif === "etudiants") {
+      router.push("/utilisateurs/etudiant/ajout");
+    } else if (roleActif === "professeurs") {
+      router.push("/utilisateurs/professeur/ajout");
+    } else {
+      // Pour les responsables, on peut ouvrir un modal ou rediriger
+      const nomComplet = prompt("Nom complet du responsable");
+      const email = prompt("Email");
+      const password = prompt("Mot de passe temporaire");
+      
+      if (nomComplet && email && password) {
+        const parts = nomComplet.trim().split(" ");
+        const prenom = parts[0];
+        const nom = parts.slice(1).join(" ") || prenom;
+        
+        try {
+          const token = localStorage.getItem("token");
+          const response = await fetch(`${API_URL}/Auth/register`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              nom: nom,
+              prenom: prenom,
+              email: email,
+              password: password,
+              telephone: "",
+              role: "RESPONSABLE",
+            }),
+          });
+          
+          if (!response.ok) throw new Error("Erreur lors de la création");
+          alert("Compte responsable créé avec succès");
+          setRefreshTrigger(prev => prev + 1);
+        } catch (err) {
+          alert("Erreur lors de la création");
+        }
+      }
+    }
+    
+    setIsCreating(false);
+  };
 
   return (
     <div className="space-y-6">
@@ -33,7 +85,7 @@ export default function UtilisateursPage() {
               roleActif === "etudiants" ? "bg-pink text-black shadow" : "text-light/80 hover:text-white"
             }`}
           >
-             Étudiants
+            Étudiants
           </button>
           <button
             onClick={() => { setRoleActif("professeurs"); setRecherche(""); }}
@@ -41,7 +93,7 @@ export default function UtilisateursPage() {
               roleActif === "professeurs" ? "bg-pink text-black shadow" : "text-light/80 hover:text-white"
             }`}
           >
-             Professeurs
+            Professeurs
           </button>
           <button
             onClick={() => { setRoleActif("responsables"); setRecherche(""); }}
@@ -49,7 +101,7 @@ export default function UtilisateursPage() {
               roleActif === "responsables" ? "bg-pink text-black shadow" : "text-light/80 hover:text-white"
             }`}
           >
-             Responsables
+            Responsables
           </button>
         </div>
       </div>
@@ -64,16 +116,20 @@ export default function UtilisateursPage() {
           className="bg-purple border border-muted/30 text-white rounded-lg px-4 py-1.5 text-sm focus:outline-none focus:border-pink w-full sm:w-72"
         />
         
-        <button className="bg-purple border border-pink text-pink text-xs font-semibold px-4 py-2 rounded-xl hover:bg-pink hover:text-black transition-all w-full sm:w-auto">
-          + Créer un compte {roleActif === "etudiants" ? "Étudiant" : roleActif === "professeurs" ? "Professeur" : "Admin"}
+        <button 
+          onClick={handleCreateUser}
+          disabled={isCreating}
+          className="bg-purple border border-pink text-pink text-xs font-semibold px-4 py-2 rounded-xl hover:bg-pink hover:text-black transition-all w-full sm:w-auto disabled:opacity-50"
+        >
+          {isCreating ? "Création..." : `+ Créer un compte ${roleActif === "etudiants" ? "Étudiant" : roleActif === "professeurs" ? "Professeur" : "Admin"}`}
         </button>
       </div>
 
       {/* --- BODY DYNAMIQUE : AFFICHAGE DE LA LISTE SÉLECTIONNÉE --- */}
       <div className="mt-4 animate-fadeIn">
-        {roleActif === "etudiants" && <Etudiant filtreRecherche={recherche} />}
-        {roleActif === "professeurs" && <Professeur filtreRecherche={recherche} />}
-        {roleActif === "responsables" && <Responsable filtreRecherche={recherche} />}
+        {roleActif === "etudiants" && <Etudiant filtreRecherche={recherche} refreshTrigger={refreshTrigger} />}
+        {roleActif === "professeurs" && <Professeur filtreRecherche={recherche} refreshTrigger={refreshTrigger} />}
+        {roleActif === "responsables" && <Responsable filtreRecherche={recherche} refreshTrigger={refreshTrigger} />}
       </div>
     </div>
   );
