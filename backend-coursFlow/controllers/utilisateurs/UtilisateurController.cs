@@ -5,7 +5,7 @@ namespace BackendCoursFlow.Controllers.Utilisateurs;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "ADMIN")]
+//[Authorize(Roles = "ADMIN")]
 public class UtilisateurController : ControllerBase
 {
     private readonly IUtilisateurService _utilisateurService;

@@ -7,7 +7,7 @@ namespace BackendCoursFlow.Controllers.EmploiDuTemps;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+//[Authorize]
 public class EmploiDuTempsController : ControllerBase
 {
     private readonly IEmploiDuTempsService _edtService;
@@ -65,7 +65,7 @@ public class EmploiDuTempsController : ControllerBase
     }
     
     [HttpPost]
-    [Authorize(Roles = "ADMIN,RESPONSABLE")]
+    //[Authorize(Roles = "ADMIN,RESPONSABLE")]
     public async Task<IActionResult> CreateEmploi([FromBody] CreateEmploiDuTempsRequest request)
     {
         try
@@ -81,7 +81,7 @@ public class EmploiDuTempsController : ControllerBase
     }
     
     [HttpPut("{id}")]
-    [Authorize(Roles = "ADMIN,RESPONSABLE")]
+    //[Authorize(Roles = "ADMIN,RESPONSABLE")]
     public async Task<IActionResult> UpdateEmploi(int id, [FromBody] CreateEmploiDuTempsRequest request)
     {
         try
@@ -100,7 +100,7 @@ public class EmploiDuTempsController : ControllerBase
     }
     
     [HttpDelete("{id}")]
-    [Authorize(Roles = "ADMIN,RESPONSABLE")]
+    //[Authorize(Roles = "ADMIN,RESPONSABLE")]
     public async Task<IActionResult> DeleteEmploi(int id)
     {
         try

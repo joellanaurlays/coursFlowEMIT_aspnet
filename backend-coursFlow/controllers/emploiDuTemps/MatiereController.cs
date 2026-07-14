@@ -7,7 +7,7 @@ namespace BackendCoursFlow.Controllers.EmploiDuTemps;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+//[Authorize]
 public class MatiereController : ControllerBase
 {
     private readonly IMatiereService _matiereService;
@@ -53,7 +53,7 @@ public class MatiereController : ControllerBase
     }
     
     [HttpPost]
-    [Authorize(Roles = "ADMIN,RESPONSABLE")]
+    //[Authorize(Roles = "ADMIN,RESPONSABLE")]
     public async Task<IActionResult> CreateMatiere([FromBody] CreateMatiereRequest request)
     {
         try
@@ -69,7 +69,7 @@ public class MatiereController : ControllerBase
     }
     
     [HttpPut("{id}")]
-    [Authorize(Roles = "ADMIN,RESPONSABLE")]
+    //[Authorize(Roles = "ADMIN,RESPONSABLE")]
     public async Task<IActionResult> UpdateMatiere(int id, [FromBody] CreateMatiereRequest request)
     {
         try
@@ -88,7 +88,7 @@ public class MatiereController : ControllerBase
     }
     
     [HttpDelete("{id}")]
-    [Authorize(Roles = "ADMIN,RESPONSABLE")]
+    //[Authorize(Roles = "ADMIN,RESPONSABLE")]
     public async Task<IActionResult> DeleteMatiere(int id)
     {
         try
