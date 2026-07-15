@@ -12,15 +12,16 @@ build/
 .env
 .env.local
 
+# Next.js
+frontend-coursFlow/.next/
+frontend-coursFlow/node_modules/
 
+# Logs
+*.log
 
-
-
-
-
-
-
-
+# Build
+dist/
+build/
 
 .env.development.local
 .env.test.local

@@ -17,6 +17,17 @@ appsettings.Local.json
 # Entity Framework
 *.db
 
+# Next.js
+frontend-coursFlow/.next/
+frontend-coursFlow/node_modules/
+
+# Logs
+*.log
+
+# Build
+dist/
+build/
+
 # Dépendances Node
 node_modules/
 
