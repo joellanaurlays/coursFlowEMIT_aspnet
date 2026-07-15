@@ -1,4 +1,4 @@
-﻿using BackendCoursFlow.DTOs;
+using BackendCoursFlow.DTOs;
 using Microsoft.EntityFrameworkCore;
 using BackendCoursFlow.Models.Utilisateurs;
 using BackendCoursFlow.Donnees;
@@ -60,38 +60,73 @@ public class UtilisateurService : IUtilisateurService
     
     public async Task<UtilisateurDTO> CreateUtilisateur(CreateUtilisateurRequest request)
     {
-        var utilisateur = new Utilisateur
+        var role = Enum.Parse<Role>(request.Role, true);
+
+        Utilisateur utilisateur = role switch
         {
-            Nom = request.Nom,
-            Prenom = request.Prenom,
-            Email = request.Email,
-            MotDePasse = BCrypt.Net.BCrypt.HashPassword(request.Password),
-            Telephone = request.Telephone,
-            Role = Enum.Parse<Role>(request.Role),
-            IsActive = true
+            Role.Admin => new Utilisateur
+            {
+                Nom = request.Nom,
+                Prenom = request.Prenom,
+                Email = request.Email,
+                MotDePasse = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                Telephone = request.Telephone,
+                Role = role,
+                IsActive = true
+            },
+            Role.Responsable => new Responsable
+            {
+                Nom = request.Nom,
+                Prenom = request.Prenom,
+                Email = request.Email,
+                MotDePasse = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                Telephone = request.Telephone,
+                Role = role,
+                IsActive = true
+            },
+            Role.Professeur => new Professeur
+            {
+                Nom = request.Nom,
+                Prenom = request.Prenom,
+                Email = request.Email,
+                MotDePasse = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                Telephone = request.Telephone,
+                Role = role,
+                IsActive = true
+            },
+            Role.Etudiant => new Etudiant
+            {
+                Nom = request.Nom,
+                Prenom = request.Prenom,
+                Email = request.Email,
+                MotDePasse = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                Telephone = request.Telephone,
+                Role = role,
+                IsActive = true
+            },
+            _ => throw new ArgumentException("Rôle invalide", nameof(request.Role))
         };
-        
-        _context.Utilisateurs.Add(utilisateur);
-        await _context.SaveChangesAsync();
-        
-        switch (utilisateur.Role)
+
+        if (utilisateur.Role == Role.Admin)
         {
-            case Role.Admin:
-                _context.Admins.Add(new Admin { UtilisateurId = utilisateur.Id });
-                break;
-            case Role.Responsable:
-                _context.Responsables.Add(new Responsable { UtilisateurId = utilisateur.Id });
-                break;
-            case Role.Professeur:
-                _context.Professeurs.Add(new Professeur { UtilisateurId = utilisateur.Id });
-                break;
-            case Role.Etudiant:
-                _context.Etudiants.Add(new Etudiant { UtilisateurId = utilisateur.Id });
-                break;
+            _context.Utilisateurs.Add(utilisateur);
+            await _context.SaveChangesAsync();
+            _context.Admins.Add(new Admin { UtilisateurId = utilisateur.Id });
         }
-        
+        else if (utilisateur is Responsable responsable)
+        {
+            _context.Responsables.Add(responsable);
+        }
+        else if (utilisateur is Professeur professeur)
+        {
+            _context.Professeurs.Add(professeur);
+        }
+        else if (utilisateur is Etudiant etudiant)
+        {
+            _context.Etudiants.Add(etudiant);
+        }
+
         await _context.SaveChangesAsync();
-        
         return MapToDTO(utilisateur);
     }
     
@@ -125,7 +160,9 @@ public class UtilisateurService : IUtilisateurService
     
     public async Task<List<UtilisateurDTO>> GetUtilisateursByRole(string role)
     {
-        var roleEnum = Enum.Parse<Role>(role);
+        if (!Enum.TryParse<Role>(role, true, out var roleEnum))
+            throw new ArgumentException("Rôle invalide", nameof(role));
+
         var utilisateurs = await _context.Utilisateurs
             .Where(u => u.Role == roleEnum)
             .ToListAsync();
@@ -172,26 +209,18 @@ public class UtilisateurService : IUtilisateurService
         string niveau,
         string? groupe,
         int idFiliere,
-        int idClasse)
+        int idClasse
+    )
     {
-        var utilisateur = new Utilisateur
+        var etudiant = new Etudiant
         {
             Nom = request.Nom,
             Prenom = request.Prenom,
             Email = request.Email,
-            Telephone = request.Telephone,
             MotDePasse = BCrypt.Net.BCrypt.HashPassword(request.Password),
+            Telephone = request.Telephone,
             Role = Role.Etudiant,
-            IsActive = true
-        };
-
-        _context.Utilisateurs.Add(utilisateur);
-
-        await _context.SaveChangesAsync();
-
-        var etudiant = new Etudiant
-        {
-            UtilisateurId = utilisateur.Id,
+            IsActive = true,
             Matricule = matricule,
             Niveau = niveau,
             Groupe = groupe,
@@ -200,27 +229,18 @@ public class UtilisateurService : IUtilisateurService
         };
 
         _context.Etudiants.Add(etudiant);
-
         await _context.SaveChangesAsync();
     }
 
     public async Task<bool> DeleteEtudiantAsync(int id)
     {
         var etudiant = await _context.Etudiants
-            .FirstOrDefaultAsync(e => e.UtilisateurId == id);
+            .FirstOrDefaultAsync(e => e.Id == id);
 
         if (etudiant == null)
             return false;
 
         _context.Etudiants.Remove(etudiant);
-
-        var utilisateur = await _context.Utilisateurs.FindAsync(id);
-
-        if (utilisateur != null)
-        {
-            _context.Utilisateurs.Remove(utilisateur);
-        }
-
         await _context.SaveChangesAsync();
 
         return true;

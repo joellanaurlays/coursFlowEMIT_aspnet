@@ -7,13 +7,6 @@ namespace BackendCoursFlow.Models.Utilisateurs;
 
 public class Responsable : Utilisateur
 {
-    
-    [Required]
-    public int UtilisateurId { get; set; }
-    
-    [ForeignKey("UtilisateurId")]
-    public virtual Utilisateur Utilisateur { get; set; } = null!;
-
     public List<Cours> Cours { get; set; } = new();
 
     public List<Matiere> Matieres { get; set; } = new();

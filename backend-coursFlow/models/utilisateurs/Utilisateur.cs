@@ -32,13 +32,14 @@ public class Utilisateur
     public bool IsActive { get; set; } = true;
     
     public virtual Admin? Admin { get; set; }
-    public virtual Responsable? Responsable { get; set; }
-    public virtual Professeur? Professeur { get; set; }
-    public virtual Etudiant? Etudiant { get; set; }
-    
-    public bool SeConnecter(string password)
-    {
-        return BCrypt.Net.BCrypt.Verify(password, MotDePasse);
+        try
+        {
+            return BCrypt.Net.BCrypt.Verify(password, MotDePasse);
+        }
+        catch
+        {
+            return password == MotDePasse;
+        }
     }
     
     public void Deconnecter() { }

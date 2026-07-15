@@ -51,7 +51,7 @@ public class AuthController : ControllerBase
     }
     
     [HttpPost("logout")]
-    public async Task<IActionResult> Logout()
+    public IActionResult Logout()
     {
         // Le token est géré côté client
         return Ok(new { message = "Déconnecté avec succès" });

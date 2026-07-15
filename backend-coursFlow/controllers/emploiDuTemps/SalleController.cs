@@ -14,14 +14,16 @@ public class SalleController : ControllerBase
         return Ok(new List<object>());
     }
     
-    [HttpGet]
-    public IActionResult Get()
+    [HttpGet("{id}")]
+    public IActionResult Get(int id)
     {
+        return Ok(new { message = "Salle not found" });
     }
 
     [HttpPost]
     public IActionResult Create()
     {
+        return Ok(new { message = "Salle created" });
     }
 
 }

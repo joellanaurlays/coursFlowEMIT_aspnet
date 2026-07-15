@@ -1,22 +1,14 @@
 namespace BackendCoursFlow.DTOs;
 
-public class CoursDTOs
+public class CoursDTO
 {
-    public int IdCours { get; set; }
+    public int Id { get; set; }
 
-    public string AnneeUniversitaire { get; set; } = string.Empty;
+    public string Titre { get; set; } = string.Empty;
 
-    public string Semestre { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
 
-    public string TypeCours { get; set; } = string.Empty;
+    public int MatiereId { get; set; }
 
-    public int Duree { get; set; }
-
-    public int VolumeHoraire { get; set; }
-
-    public string MatiereNom { get; set; } = string.Empty;
-
-    public string ProfesseurNom { get; set; } = string.Empty;
-
-    public string? SalleNom { get; set; }
+    public string Matiere { get; set; } = string.Empty;
 }

@@ -13,10 +13,10 @@ public class CreateCoursRequest
     [Required]
     public string TypeCours { get; set; } = string.Empty;
 
-    [Range(1,20)]
+    [Range(1, 20)]
     public int Duree { get; set; }
 
-    [Range(1,1000)]
+    [Range(1, 1000)]
     public int VolumeHoraire { get; set; }
 
     [Required]

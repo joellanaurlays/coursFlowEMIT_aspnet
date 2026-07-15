@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using BackendCoursFlow.Donnees;
+using BackendCoursFlow.Middlewares;
 
 using BackendCoursFlow.Services.EmploiDuTemps;
 using BackendCoursFlow.Services.Utilisateurs;
@@ -103,22 +104,19 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowNextJs");
 
-
+app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 
-
 app.MapControllers();
 
-
-
-// Création DB
+// Création / migration DB
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider
         .GetRequiredService<ApplicationDbContext>();
 
-    dbContext.Database.EnsureCreated();
+    dbContext.Database.Migrate();
 }
 
 app.Run();

@@ -19,7 +19,6 @@ public class DisponibiliteService
     {
         var disponibilites = await _context.Disponibilites
             .Include(d => d.Professeur)
-                .ThenInclude(p => p.Utilisateur)
             .Where(d => d.IdProf == profId)
             .OrderBy(d => d.Jour)
             .ThenBy(d => d.HeureDebut)
@@ -33,9 +32,8 @@ public class DisponibiliteService
             HeureFin = d.HeureFin.ToString(@"hh\:mm"),
             Type = d.Type.ToString(),
             ProfesseurId = d.IdProf,
-            ProfesseurNom = d.Professeur != null && d.Professeur.Utilisateur != null
-                ? $"{d.Professeur.Utilisateur.Nom} {d.Professeur.Utilisateur.Prenom}"
-                : "Inconnu"
+            ProfesseurNom = d.Professeur != null
+                ? $"{d.Professeur.Nom} {d.Profess
         }).ToList();
     }
 

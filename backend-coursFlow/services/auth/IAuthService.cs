@@ -61,39 +61,71 @@ public class AuthService : IAuthService
         if (existingUser != null)
             throw new Exception("Un utilisateur avec cet email existe déjà");
             
-        var user = new Utilisateur
-        {
-            Nom = request.Nom,
-            Prenom = request.Prenom,
-            Email = request.Email,
-            MotDePasse = BCrypt.Net.BCrypt.HashPassword(request.Password),
-            Telephone = request.Telephone,
-            Role = Enum.Parse<Role>(request.Role),
-            IsActive = true
-        };
-        
-        _context.Utilisateurs.Add(user);
-        await _context.SaveChangesAsync();
-        
-        // Créer l'entité correspondante selon le rôle
-        switch (user.Role)
+        var role = Enum.Parse<Role>(request.Role, true);
+
+        Utilisateur user;
+
+        switch (role)
         {
             case Role.Admin:
+                user = new Utilisateur
+                {
+                    Nom = request.Nom,
+                    Prenom = request.Prenom,
+                    Email = request.Email,
+                    MotDePasse = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                    Telephone = request.Telephone,
+                    Role = role,
+                    IsActive = true
+                };
+                _context.Utilisateurs.Add(user);
+                await _context.SaveChangesAsync();
                 _context.Admins.Add(new Admin { UtilisateurId = user.Id });
                 break;
             case Role.Responsable:
-                _context.Responsables.Add(new Responsable { UtilisateurId = user.Id });
+                user = new Responsable
+                {
+                    Nom = request.Nom,
+                    Prenom = request.Prenom,
+                    Email = request.Email,
+                    MotDePasse = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                    Telephone = request.Telephone,
+                    Role = role,
+                    IsActive = true
+                };
+                _context.Responsables.Add((Responsable)user);
                 break;
             case Role.Professeur:
-                _context.Professeurs.Add(new Professeur { UtilisateurId = user.Id });
+                user = new Professeur
+                {
+                    Nom = request.Nom,
+                    Prenom = request.Prenom,
+                    Email = request.Email,
+                    MotDePasse = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                    Telephone = request.Telephone,
+                    Role = role,
+                    IsActive = true
+                };
+                _context.Professeurs.Add((Professeur)user);
                 break;
             case Role.Etudiant:
-                _context.Etudiants.Add(new Etudiant { UtilisateurId = user.Id });
+                user = new Etudiant
+                {
+                    Nom = request.Nom,
+                    Prenom = request.Prenom,
+                    Email = request.Email,
+                    MotDePasse = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                    Telephone = request.Telephone,
+                    Role = role,
+                    IsActive = true
+                };
+                _context.Etudiants.Add((Etudiant)user);
                 break;
+            default:
+                throw new ArgumentException("Rôle invalide", nameof(request.Role));
         }
-        
+
         await _context.SaveChangesAsync();
-        
         return user;
     }
     

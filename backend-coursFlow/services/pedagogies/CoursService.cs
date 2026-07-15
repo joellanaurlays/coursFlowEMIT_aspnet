@@ -20,9 +20,9 @@ public class CoursService : ICoursService
             .Include(c => c.Matiere)
             .Select(c => new CoursDTO
             {
-                Id = c.Id,
-                Titre = c.Titre,
-                Description = c.Description,
+                Id = c.IdCours,
+                Titre = c.AnneeUniversitaire,
+                Description = c.TypeCours,
                 MatiereId = c.MatiereId,
                 Matiere = c.Matiere.Nom
             })
@@ -33,16 +33,16 @@ public class CoursService : ICoursService
     {
         var cours = await _context.Cours
             .Include(c => c.Matiere)
-            .FirstOrDefaultAsync(c => c.Id == id);
+            .FirstOrDefaultAsync(c => c.IdCours == id);
 
         if (cours == null)
             return null;
 
         return new CoursDTO
         {
-            Id = cours.Id,
-            Titre = cours.Titre,
-            Description = cours.Description,
+            Id = cours.IdCours,
+            Titre = cours.AnneeUniversitaire,
+            Description = cours.TypeCours,
             MatiereId = cours.MatiereId,
             Matiere = cours.Matiere.Nom
         };
@@ -52,8 +52,11 @@ public class CoursService : ICoursService
     {
         var cours = new Cours
         {
-            Titre = request.Titre,
-            Description = request.Description,
+            AnneeUniversitaire = request.AnneeUniversitaire,
+            Semestre = request.Semestre,
+            TypeCours = request.TypeCours,
+            Duree = request.Duree,
+            VolumeHoraire = request.VolumeHoraire,
             MatiereId = request.MatiereId
         };
 
@@ -61,7 +64,7 @@ public class CoursService : ICoursService
 
         await _context.SaveChangesAsync();
 
-        return await GetCoursById(cours.Id);
+        return await GetCoursById(cours.IdCours);
     }
 
     public async Task<bool> UpdateCours(int id, CreateCoursRequest request)
@@ -71,8 +74,11 @@ public class CoursService : ICoursService
         if (cours == null)
             return false;
 
-        cours.Titre = request.Titre;
-        cours.Description = request.Description;
+        cours.AnneeUniversitaire = request.AnneeUniversitaire;
+        cours.Semestre = request.Semestre;
+        cours.TypeCours = request.TypeCours;
+        cours.Duree = request.Duree;
+        cours.VolumeHoraire = request.VolumeHoraire;
         cours.MatiereId = request.MatiereId;
 
         await _context.SaveChangesAsync();

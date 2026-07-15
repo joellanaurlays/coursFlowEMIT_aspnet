@@ -48,34 +48,12 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Cours>()
             .HasOne(c => c.Professeur)
             .WithMany(p => p.Cours)
-            .HasForeignKey(c => c.ProfesseurId)
-            .HasPrincipalKey(p => p.IdProf);
+            .HasForeignKey(c => c.ProfesseurId);
 
         modelBuilder.Entity<Utilisateur>()
-            .HasOne(u => u.Responsable)
-            .WithOne(r => r.Utilisateur)
-            .HasForeignKey<Responsable>(r => r.UtilisateurId);
-            
-        modelBuilder.Entity<Utilisateur>()
-            .HasOne(u => u.Professeur)
-            .WithOne(p => p.Utilisateur)
-            .HasForeignKey<Professeur>(p => p.UtilisateurId);
-            
-        modelBuilder.Entity<Utilisateur>()
-            .HasOne(u => u.Etudiant)
-            .WithOne(e => e.Utilisateur)
-            .HasForeignKey<Etudiant>(e => e.UtilisateurId);
-        
-        // Index uniques
-        modelBuilder.Entity<Utilisateur>()
-            .HasIndex(u => u.Email)
-            .IsUnique();
-            
-        modelBuilder.Entity<Etudiant>()
-            .HasIndex(e => e.Matricule)
-            .IsUnique();
-            
-        modelBuilder.Entity<Matiere>()
+            .HasOne(u => u.Admin)
+            .WithOne(a => a.Utilisateur)
+            .HasForeignKey<Admin>(a => a
             .HasIndex(m => m.Code)
             .IsUnique();
     }

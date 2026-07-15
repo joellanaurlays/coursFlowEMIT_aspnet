@@ -18,18 +18,17 @@ public class ProfesseurService
     public async Task<List<UtilisateurDTO>> GetAllProfesseursAsync()
     {
         var professeurs = await _context.Professeurs
-            .Include(p => p.Utilisateur)
             .ToListAsync();
 
         return professeurs.Select(p => new UtilisateurDTO
         {
-            Id = p.IdProf,
-            Nom = p.Utilisateur?.Nom ?? string.Empty,
-            Prenom = p.Utilisateur?.Prenom ?? string.Empty,
-            Email = p.Utilisateur?.Email ?? string.Empty,
-            Telephone = p.Utilisateur?.Telephone,
+            Id = p.Id,
+            Nom = p.Nom,
+            Prenom = p.Prenom,
+            Email = p.Email,
+            Telephone = p.Telephone,
             Role = "Professeur",
-            IsActive = p.Utilisateur?.IsActive ?? true
+            IsActive = p.IsActive
         }).ToList();
     }
 
@@ -37,18 +36,16 @@ public class ProfesseurService
     public async Task<Professeur?> GetProfesseurDetailsAsync(int id)
     {
         return await _context.Professeurs
-            .Include(p => p.Utilisateur)
             .Include(p => p.Disponibilites)
             .Include(p => p.Cours)
                 .ThenInclude(c => c.Matiere)
-            .FirstOrDefaultAsync(p => p.IdProf == id);
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
 
     // Ajout 
     public async Task CreateProfesseurWithDtoAsync(CreateUtilisateurRequest userRequest, string grade, string specialite)
     {
-        // Création de l'utilisateur de base
-        var nouvelUtilisateur = new Utilisateur
+        var nouveauProf = new Professeur
         {
             Nom = userRequest.Nom,
             Prenom = userRequest.Prenom,
@@ -56,16 +53,7 @@ public class ProfesseurService
             MotDePasse = userRequest.Password,
             Telephone = userRequest.Telephone,
             Role = Role.Professeur,
-            IsActive = true
-        };
-
-        _context.Utilisateurs.Add(nouvelUtilisateur);
-        await _context.SaveChangesAsync();
-
-        // Création du professeur
-        var nouveauProf = new Professeur
-        {
-            UtilisateurId = nouvelUtilisateur.Id,
+            IsActive = true,
             Grade = grade,
             Specialite = specialite
         };
@@ -77,15 +65,15 @@ public class ProfesseurService
     // Mise à jour
     public async Task UpdateProfesseurAsync(int idProf, UpdateUtilisateurRequest updateRequest, string? grade, string? specialite)
     {
-        var prof = await _context.Professeurs.Include(p => p.Utilisateur).FirstOrDefaultAsync(p => p.IdProf == idProf);
+        var prof = await _context.Professeurs.FirstOrDefaultAsync(p => p.Id == idProf);
 
-        if (prof != null && prof.Utilisateur != null)
+        if (prof != null)
         {
-            // Mise à jour des infos utilisateur
-            if (updateRequest.Nom != null) prof.Utilisateur.Nom = updateRequest.Nom;
-            if (updateRequest.Prenom != null) prof.Utilisateur.Prenom = updateRequest.Prenom;
-            if (updateRequest.Telephone != null) prof.Utilisateur.Telephone = updateRequest.Telephone;
-            if (updateRequest.IsActive != null) prof.Utilisateur.IsActive = updateRequest.IsActive.Value;
+            // Mise à jour des infos utilisateur (héritées)
+            if (updateRequest.Nom != null) prof.Nom = updateRequest.Nom;
+            if (updateRequest.Prenom != null) prof.Prenom = updateRequest.Prenom;
+            if (updateRequest.Telephone != null) prof.Telephone = updateRequest.Telephone;
+            if (updateRequest.IsActive != null) prof.IsActive = updateRequest.IsActive.Value;
 
             // Mise à jour des infos spécifiques au prof
             if (grade != null) prof.Grade = grade;
