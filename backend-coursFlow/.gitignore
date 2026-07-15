@@ -1,23 +1,50 @@
-## Fichiers de compilation
+# Compilation
 bin/
 obj/
 [Bb]in/
 [Oo]bj/
 
-## Fichiers de configuration locale (Mots de passe DB)
-appsettings.Development.json
-appsettings.Local.json
-
-## Fichiers d'IDE (Visual Studio / VS Code)
+# Fichiers temporaires Visual Studio
 .vs/
-.vscode/
 *.user
 *.userosscache
 *.sln.docstates
 
-## Fichiers OS
-.DS_Store
-thumbs.db
+# Configuration locale
+appsettings.Development.json
+appsettings.Local.json
 
-## Entity Framework
+# Entity Framework
 *.db
+
+# Dépendances Node
+node_modules/
+
+# Build Next.js
+.next/
+out/
+
+# Fichiers de cache
+.cache/
+.turbo/
+
+# Logs npm/yarn
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Variables d'environnement
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+
+# VS Code
+.vscode/
+
+# Système
+.DS_Store
+Thumbs.db
