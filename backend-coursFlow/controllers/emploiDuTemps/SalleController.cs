@@ -13,5 +13,15 @@ public class SalleController : ControllerBase
     {
         return Ok(new List<object>());
     }
+    
+    [HttpGet]
+    public IActionResult Get()
+    {
+    }
+
+    [HttpPost]
+    public IActionResult Create()
+    {
+    }
 
 }

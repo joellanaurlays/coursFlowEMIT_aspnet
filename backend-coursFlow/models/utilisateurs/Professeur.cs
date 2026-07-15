@@ -8,7 +8,7 @@ using BackendCoursFlow.Models.Enums;
 
 namespace BackendCoursFlow.Models.Utilisateurs;
 
-public class Professeur : Utilisateur
+public class Professeur
 {
     public int IdProf { get; set; }
 

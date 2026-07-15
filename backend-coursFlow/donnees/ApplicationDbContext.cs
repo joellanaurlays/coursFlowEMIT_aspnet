@@ -45,6 +45,12 @@ public class ApplicationDbContext : DbContext
             .WithOne(a => a.Utilisateur)
             .HasForeignKey<Admin>(a => a.UtilisateurId);
             
+        modelBuilder.Entity<Cours>()
+            .HasOne(c => c.Professeur)
+            .WithMany(p => p.Cours)
+            .HasForeignKey(c => c.ProfesseurId)
+            .HasPrincipalKey(p => p.IdProf);
+
         modelBuilder.Entity<Utilisateur>()
             .HasOne(u => u.Responsable)
             .WithOne(r => r.Utilisateur)

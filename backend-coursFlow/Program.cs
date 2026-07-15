@@ -5,6 +5,10 @@ using BackendCoursFlow.Services.EmploiDuTemps;
 using BackendCoursFlow.Services.Utilisateurs;
 using BackendCoursFlow.Services.Auth;
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,9 +37,21 @@ builder.Services.AddScoped<IUtilisateurService, UtilisateurService>();
 
 
 // Services Auth
-
-// à ajouter quand AuthService.cs existe
-// builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!)
+        )
+    };
+});
 
 
 // PostgreSQL
@@ -88,10 +104,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowNextJs");
 
 
-// JWT désactivé temporairement
-// app.UseAuthentication();
-
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 
@@ -107,7 +120,5 @@ using (var scope = app.Services.CreateScope())
 
     dbContext.Database.EnsureCreated();
 }
-
-
 
 app.Run();
